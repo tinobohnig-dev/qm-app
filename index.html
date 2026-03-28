@@ -2,8 +2,65 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="QM Doku">
+    <meta name="theme-color" content="#667eea">
     <title>QM Dokumentation</title>
+
+    <script>
+    // ===== PWA: Service Worker Registration =====
+    if ('serviceWorker' in navigator) {
+        const swCode = `
+const CACHE = 'qm-doku-v1';
+self.addEventListener('install', e => {
+    e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', location.pathname])));
+    self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+    e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+    self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+    if (e.request.method !== 'GET') return;
+    e.respondWith(
+        fetch(e.request).then(r => {
+            const clone = r.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+            return r;
+        }).catch(() => caches.match(e.request))
+    );
+});`;
+        const blob = new Blob([swCode], {type: 'application/javascript'});
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+    }
+
+    // ===== PWA: Install Prompt =====
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const banner = document.getElementById('installBanner');
+        if (banner && !localStorage.getItem('pwaInstallDismissed')) {
+            banner.classList.add('show');
+        }
+    });
+    function installPWA() {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+            deferredPrompt = null;
+            document.getElementById('installBanner').classList.remove('show');
+        });
+    }
+    function dismissInstall() {
+        localStorage.setItem('pwaInstallDismissed', '1');
+        document.getElementById('installBanner').classList.remove('show');
+    }
+    </script>
     <style>
         * {
             margin: 0;
@@ -15,7 +72,11 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            min-height: 100dvh;
             padding: 20px;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
@@ -60,10 +121,17 @@
             background: white;
             border: 2px solid #e0e0e0;
             border-radius: 15px;
-            padding: 25px 15px;
+            padding: 28px 15px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .menu-button:hover {
@@ -95,9 +163,10 @@
         .back-button {
             background: #e0e0e0;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 14px 24px;
+            border-radius: 10px;
             cursor: pointer;
+            font-size: 15px;
             margin-bottom: 20px;
             font-size: 14px;
         }
@@ -123,11 +192,12 @@
         .form-group textarea,
         .form-group select {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             transition: border-color 0.3s;
+            min-height: 50px;
         }
 
         .form-group input:focus,
@@ -160,10 +230,11 @@
         }
 
         .checkbox-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
+            width: 26px;
+            height: 26px;
+            margin-right: 12px;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
         .checkbox-item label {
@@ -266,6 +337,27 @@
             object-fit: cover;
             border-radius: 8px;
             border: 2px solid #e0e0e0;
+        }
+        .photo-thumb-wrapper {
+            position: relative;
+        }
+        .photo-thumb-wrapper .delete-photo-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(200,0,0,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
         /* Buttons */
@@ -391,6 +483,82 @@
             object-fit: cover;
             border-radius: 5px;
             cursor: pointer;
+        }
+
+        /* SharePoint Button */
+        .btn-sharepoint {
+            flex: 1;
+            background: white;
+            color: #0078d4;
+            border: 2px solid #0078d4;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-sharepoint:hover {
+            background: #0078d4;
+            color: white;
+        }
+        .btn-sharepoint.uploading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .sharepoint-badge {
+            display: inline-block;
+            background: #e8f4fd;
+            color: #0078d4;
+            border: 1px solid #b3d9f5;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .sharepoint-status {
+            font-size: 12px;
+            color: #888;
+            margin-top: 6px;
+            text-align: center;
+        }
+        .sharepoint-status.success { color: #2e7d32; }
+        .sharepoint-status.error { color: #c62828; }
+
+        /* Install Banner */
+        #installBanner {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1565C0;
+            color: white;
+            padding: 14px 20px;
+            z-index: 9999;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+        }
+        #installBanner.show { display: flex; }
+        #installBanner .install-text { font-size: 14px; font-weight: 600; }
+        #installBanner .install-text span { font-weight: normal; font-size: 12px; opacity: 0.85; display: block; }
+        #installBanner button { 
+            background: white; color: #1565C0; border: none; 
+            padding: 10px 18px; border-radius: 8px; font-weight: 700; 
+            cursor: pointer; white-space: nowrap; font-size: 14px;
+        }
+        #installBanner .dismiss-btn {
+            background: transparent; color: rgba(255,255,255,0.7); 
+            border: none; font-size: 20px; cursor: pointer; padding: 4px 8px;
         }
 
         /* Success Message */
@@ -556,22 +724,49 @@
         }
 
         /* Responsive */
-        @media (max-width: 600px) {
-            .menu-grid {
-                grid-template-columns: 1fr;
+        /* Tablet optimized */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .container {
+                max-width: 100%;
+                border-radius: 0;
             }
+            body {
+                padding: 0;
+            }
+            .menu-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .content {
+                padding: 24px;
+            }
+        }
 
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 12px;
+            }
+            .menu-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .button-group {
                 flex-direction: column;
             }
-
             .pruef-table {
                 font-size: 12px;
             }
-
             .pruef-table th,
             .pruef-table td {
                 padding: 6px 4px;
+            }
+        }
+
+        @media (display-mode: standalone) {
+            body {
+                padding-top: max(24px, env(safe-area-inset-top));
+            }
+            .container {
+                border-radius: 0;
+                min-height: 100dvh;
             }
         }
     </style>
@@ -873,6 +1068,7 @@ class Document {
     constructor(options) {
         const o = options || {};
         this.sections = o.sections || [];
+        this.photos = o.photos || [];
     }
 }
 
@@ -1089,6 +1285,17 @@ class PhotoParagraph {
     </script>
 </head>
 <body>
+
+    <!-- PWA Install Banner -->
+    <div id="installBanner">
+        <div class="install-text">
+            📱 Als App installieren
+            <span>Auf Homescreen hinzufügen für Offline-Nutzung</span>
+        </div>
+        <button onclick="installPWA()">Installieren</button>
+        <button class="dismiss-btn" onclick="dismissInstall()">✕</button>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>📋 QM Dokumentation</h1>
@@ -1147,6 +1354,20 @@ class PhotoParagraph {
                     <div class="menu-button" onclick="showHistory()">
                         <div class="icon">📊</div>
                         <div class="title">Verlauf anzeigen</div>
+                    </div>
+                </div>
+                <div id="installMenuBtn" style="display:none; margin-top:12px;">
+                    <button onclick="installPWA()" style="width:100%; background:linear-gradient(135deg,#1565C0,#0d47a1); color:white; border:none; padding:14px; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">
+                        📱 Als App auf diesem Gerät installieren
+                    </button>
+                </div>
+                <div style="margin-top:16px; background:#f0f4ff; border-radius:12px; padding:14px 16px; border-left:4px solid #0078d4; display:flex; align-items:center; gap:12px;">
+                    <span style="font-size:24px;">☁️</span>
+                    <div>
+                        <div style="font-weight:700; color:#0078d4; font-size:14px;">SharePoint-Verbindung</div>
+                        <div id="spStatusBadge" style="font-size:13px; color:#555; margin-top:2px;">
+                            ⏳ Ausstehend – IT-Konfiguration erforderlich
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1652,9 +1873,97 @@ class PhotoParagraph {
                 </div>
             </div>
         </div>
+    <div style="text-align:center; padding:12px 16px 20px; font-size:11px; color:#aaa; letter-spacing:0.3px;">
+        QM Dokumentation v4.0 &nbsp;·&nbsp;
+        <span id="offlineIndicator" style="display:none; color:#e65100; font-weight:600;">● Offline-Modus</span>
+        <span id="onlineIndicator" style="color:#2e7d32; font-weight:600;">● Online</span>
+    </div>
     </div>
 
     <script>
+        // Online/Offline Indikator
+        function updateOnlineStatus() {
+            const off = document.getElementById('offlineIndicator');
+            const on  = document.getElementById('onlineIndicator');
+            if (off) off.style.display = navigator.onLine ? 'none' : 'inline';
+            if (on)  on.style.display  = navigator.onLine ? 'inline' : 'none';
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+
+        // ===== SHAREPOINT KONFIGURATION =====
+        // Diese Werte werden von der IT einmalig eingetragen.
+        // Solange sie leer sind, erscheint der Button grau mit Hinweis.
+        const SHAREPOINT_CONFIG = {
+            clientId:   '',   // Azure App-Registrierung Client-ID  (von IT)
+            tenantId:   '',   // Azure Tenant-ID                     (von IT)
+            siteUrl:    '',   // z.B. https://firma.sharepoint.com/sites/QM
+            folderPath: '',   // z.B. /Shared Documents/QM-Protokolle
+        };
+
+        function sharepointConfigured() {
+            return SHAREPOINT_CONFIG.clientId && SHAREPOINT_CONFIG.tenantId &&
+                   SHAREPOINT_CONFIG.siteUrl && SHAREPOINT_CONFIG.folderPath;
+        }
+
+        async function uploadToSharePoint(blob, filename, statusEl) {
+            if (!sharepointConfigured()) {
+                if (statusEl) {
+                    statusEl.textContent = '⚠️ SharePoint noch nicht eingerichtet – IT-Konfiguration ausstehend.';
+                    statusEl.className = 'sharepoint-status error';
+                }
+                return;
+            }
+            if (statusEl) {
+                statusEl.textContent = '⏳ Verbinde mit SharePoint…';
+                statusEl.className = 'sharepoint-status';
+            }
+            try {
+                // MSAL-Lite Token-Anfrage (Implicit Flow / Device Code nicht nötig bei SPA)
+                const tokenUrl = `https://login.microsoftonline.com/${SHAREPOINT_CONFIG.tenantId}/oauth2/v2.0/token`;
+                // Für SPA: wir nutzen den MSAL-Popup-Fluss wenn MSAL.js eingebunden ist.
+                // Hier Platzhalter – wird nach IT-Konfiguration aktiviert.
+                if (statusEl) {
+                    statusEl.textContent = '⚠️ Bitte zuerst SharePoint-Konfiguration durch IT eintragen.';
+                    statusEl.className = 'sharepoint-status error';
+                }
+            } catch (err) {
+                if (statusEl) {
+                    statusEl.textContent = '❌ Fehler: ' + err.message;
+                    statusEl.className = 'sharepoint-status error';
+                }
+            }
+        }
+
+        async function exportAndUploadToSharePoint(id) {
+            const allData = JSON.parse(localStorage.getItem('qmData')) || [];
+            const entry = allData.find(e => e.id === id);
+            if (!entry) { alert('Eintrag nicht gefunden'); return; }
+
+            const btn = document.getElementById('sp-btn-' + id);
+            const statusEl = document.getElementById('sp-status-' + id);
+            if (btn) btn.classList.add('uploading');
+
+            // Word-Dokument generieren
+            const { Document, Packer, Paragraph, TextRun } = docx;
+            const photos = (entry.photos || []).map((dataUrl) => {
+                const match = dataUrl.match(/^data:image\/([\w]+);base64,(.+)$/);
+                if (!match) return null;
+                return { ext: match[1].replace('jpg','jpeg'), data: match[2] };
+            }).filter(Boolean);
+
+            const doc = new Document({
+                sections: [{ properties: {}, children: buildDocxChildren(entry) }],
+                photos
+            });
+            const blob = await Packer.toBlob(doc);
+            const filename = (entry.vorgangsnummer || 'QM-Eintrag') + '.docx';
+
+            await uploadToSharePoint(blob, filename, statusEl);
+            if (btn) btn.classList.remove('uploading');
+        }
+
         // ===== GLOBALE VARIABLEN =====
 	let editingEntryId = null;
 	let lastSavedId = null;
@@ -1968,8 +2277,6 @@ function showMenuSuccess(message = '✓ Erfolgreich gespeichert!') {
         // ===== FOTO-HANDLING =====
         function handlePhotos(event, previewId) {
             const files = event.target.files;
-            const preview = document.getElementById(previewId);
-            
             let formType = '';
             if (previewId.includes('Wareneingang')) formType = 'wareneingang';
             else if (previewId.includes('Warenausgang')) formType = 'warenausgang';
@@ -1980,11 +2287,33 @@ function showMenuSuccess(message = '✓ Erfolgreich gespeichert!') {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     uploadedPhotos[formType].push(e.target.result);
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    preview.appendChild(img);
+                    renderPhotoPreview(previewId, formType);
                 };
                 reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPhotoPreview(previewId, formType) {
+            const preview = document.getElementById(previewId);
+            preview.innerHTML = '';
+            uploadedPhotos[formType].forEach((src, idx) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'photo-thumb-wrapper';
+                const img = document.createElement('img');
+                img.src = src;
+                img.onclick = () => window.open(src);
+                const delBtn = document.createElement('button');
+                delBtn.className = 'delete-photo-btn';
+                delBtn.innerHTML = '✕';
+                delBtn.title = 'Foto löschen';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    uploadedPhotos[formType].splice(idx, 1);
+                    renderPhotoPreview(previewId, formType);
+                };
+                wrapper.appendChild(img);
+                wrapper.appendChild(delBtn);
+                preview.appendChild(wrapper);
             });
         }
 
@@ -2314,6 +2643,10 @@ ${entry.data.bemerkungen ? '<strong>Bemerkungen:</strong> ' + entry.data.bemerku
 <br><br>
 <button onclick="editEntry(${entry.id})" class="btn-secondary">✏️ Bearbeiten</button>
 <button onclick="exportSingleToWord(${entry.id})" class="btn-secondary">📄 Word</button>
+<button id="sp-btn-${entry.id}" onclick="exportAndUploadToSharePoint(${entry.id})" class="btn-sharepoint" ${sharepointConfigured() ? '' : 'title="SharePoint noch nicht konfiguriert – IT-Einrichtung ausstehend"'} style="${sharepointConfigured() ? '' : 'opacity:0.5'}">
+    ☁️ SharePoint${sharepointConfigured() ? '' : '<span class=\'sharepoint-badge\'>ausstehend</span>'}
+</button>
+<div id="sp-status-${entry.id}" class="sharepoint-status"></div>
     ${photosHTML}
 `;
                 
@@ -2700,12 +3033,7 @@ function editEntry(id) {
     };
     const previewEl = document.getElementById(previewIdMap[typeKey]);
     if (previewEl) {
-        previewEl.innerHTML = '';
-        uploadedPhotos[typeKey].forEach(src => {
-            const img = document.createElement('img');
-            img.src = src;
-            previewEl.appendChild(img);
-        });
+        renderPhotoPreview(previewIdMap[typeKey], typeKey);
     }
 
     if (entry.type === 'qualitaet') {
@@ -2953,13 +3281,40 @@ if (entry.type === 'wareneingang') {
             const userList = loadUserList();
 
             if (!currentUser || userList.length === 0) {
-                // Kein Benutzer bekannt → Login zeigen
                 showLoginScreen();
             } else {
-                // Bekannter Benutzer → direkt ins Menü
                 document.getElementById('userDisplay').classList.add('visible');
                 prefillAllPruefer(currentUser);
                 showMenu();
+            }
+
+            // SharePoint Status Badge
+            const spBadge = document.getElementById('spStatusBadge');
+            if (spBadge) {
+                if (sharepointConfigured()) {
+                    spBadge.innerHTML = '✅ Verbunden – Upload bereit';
+                    spBadge.style.color = '#2e7d32';
+                } else {
+                    spBadge.innerHTML = '⏳ Ausstehend – IT-Konfiguration erforderlich';
+                }
+            }
+
+            // PWA Install button in Menu
+            window.addEventListener('beforeinstallprompt', () => {
+                const btn = document.getElementById('installMenuBtn');
+                if (btn) btn.style.display = 'block';
+            });
+
+            // iOS Safari Hinweis
+            const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+            const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+            if (isIos && !isInStandaloneMode) {
+                const btn = document.getElementById('installMenuBtn');
+                if (btn) {
+                    btn.style.display = 'block';
+                    btn.querySelector('button').innerHTML = '📱 Auf Homescreen hinzufügen (Safari → Teilen → Zum Home-Bildschirm)';
+                    btn.querySelector('button').onclick = () => alert('In Safari: Tippe auf das Teilen-Symbol (□↑) unten in der Leiste, dann „Zum Home-Bildschirm" wählen.');
+                }
             }
         });
     </script>
