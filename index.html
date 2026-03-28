@@ -1,0 +1,2967 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QM Dokumentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* Hauptmenü */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .menu-button {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 25px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .menu-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .menu-button .icon {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .menu-button .title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Formular */
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .back-button {
+            background: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .back-button:hover {
+            background: #d0d0d0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Checkboxen */
+        .checkbox-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+
+        /* Erstmuster-Prüfkriterien Tabelle */
+        .pruef-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .pruef-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .pruef-table th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .pruef-table th:first-child {
+            width: 40%;
+        }
+
+        .pruef-table th.checkbox-col {
+            width: 10%;
+            text-align: center;
+        }
+
+        .pruef-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .pruef-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pruef-table tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        .pruef-table td.checkbox-col {
+            text-align: center;
+        }
+
+        .pruef-table input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .pruef-table input[type="text"] {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* Foto-Upload */
+        .photo-upload {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .photo-upload:hover {
+            background: #f8f9ff;
+        }
+
+        .photo-upload input[type="file"] {
+            display: none;
+        }
+
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Verlauf */
+        .history-list {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: box-shadow 0.4s ease, background 0.4s ease;
+        }
+
+        .history-item.highlight-new {
+            background: #f0f4ff;
+            border-left-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.35);
+        }
+
+        .history-item .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .history-item .type {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .history-item .date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .history-item .details {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+	.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.status-freigegeben {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-entwurf {
+    background: #fff8e1;
+    color: #f57f17;
+}
+
+.status-gesperrt {
+    background: #ffebee;
+    color: #c62828;
+}
+
+        .history-item .photos {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .history-item .photos img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        .success-message.show {
+    display: block;
+}
+
+.warning-message {
+    background: #ff9800;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+    text-align: center;
+}
+
+.warning-message.show {
+    display: block;
+}
+
+        
+
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-screen {
+            display: none;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .login-screen.active {
+            display: block;
+        }
+
+        .login-logo {
+            font-size: 56px;
+            margin-bottom: 12px;
+        }
+
+        .login-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .login-subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .login-user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .login-user-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .login-user-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.2);
+        }
+
+        .login-user-btn .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .login-divider {
+            color: #ccc;
+            font-size: 13px;
+            margin: 16px 0;
+            position: relative;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 42%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .login-divider::before { left: 0; }
+        .login-divider::after  { right: 0; }
+
+        .login-new-btn {
+            background: white;
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 13px 20px;
+            font-size: 15px;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.2s;
+            max-width: 320px;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        .login-new-btn:hover {
+            background: #f0f3ff;
+        }
+
+        /* Header: userDisplay nur im App-Modus zeigen */
+        .header-user-bar {
+            display: none;
+            margin-top: 14px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .header-user-bar.visible {
+            display: flex;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .pruef-table {
+                font-size: 12px;
+            }
+
+            .pruef-table th,
+            .pruef-table td {
+                padding: 6px 4px;
+            }
+        }
+    </style>
+    <script>
+// ===== INLINE DOCX GENERATOR (kein Internet erforderlich) =====
+// Minimale docx.js-kompatible Implementierung mit JSZip-freier OOXML-Erstellung
+(function() {
+'use strict';
+
+// ---- Tiny JSZip-like zip builder (Store + Deflate via CompressionStream if available) ----
+class MiniZip {
+    constructor() { this.files = []; }
+    async addFile(name, content /* string or Uint8Array */) {
+        const data = typeof content === 'string' ? new TextEncoder().encode(content) : content;
+        this.files.push({ name, data });
+    }
+    async generate() {
+        // Build a ZIP using the browser's native CompressionStream (deflate-raw) where available
+        const parts = [];
+        const centralDir = [];
+        let offset = 0;
+
+        for (const file of this.files) {
+            const nameBytes = new TextEncoder().encode(file.name);
+            let compData = file.data;
+            let method = 0; // store
+            let crc = crc32(file.data);
+
+            // Try deflate
+            if (typeof CompressionStream !== 'undefined') {
+                try {
+                    const cs = new CompressionStream('deflate-raw');
+                    const writer = cs.writable.getWriter();
+                    writer.write(file.data);
+                    writer.close();
+                    const chunks = [];
+                    const reader = cs.readable.getReader();
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        chunks.push(value);
+                    }
+                    const deflated = mergeUint8(chunks);
+                    if (deflated.length < file.data.length) { compData = deflated; method = 8; }
+                } catch(e) {}
+            }
+
+            const localHeader = buildLocalHeader(nameBytes, method, crc, compData.length, file.data.length);
+            centralDir.push(buildCentralHeader(nameBytes, method, crc, compData.length, file.data.length, offset));
+            parts.push(localHeader, compData);
+            offset += localHeader.length + compData.length;
+        }
+
+        const cdBytes = mergeUint8(centralDir);
+        const eocd = buildEOCD(this.files.length, cdBytes.length, offset);
+        return mergeUint8([...parts, cdBytes, eocd]);
+    }
+}
+
+function mergeUint8(arrays) {
+    const total = arrays.reduce((s, a) => s + a.length, 0);
+    const out = new Uint8Array(total);
+    let pos = 0;
+    for (const a of arrays) { out.set(a, pos); pos += a.length; }
+    return out;
+}
+
+function u16le(n) { return new Uint8Array([n & 0xff, (n >> 8) & 0xff]); }
+function u32le(n) { const a = new Uint8Array(4); new DataView(a.buffer).setUint32(0, n >>> 0, true); return a; }
+
+function buildLocalHeader(nameBytes, method, crc, compLen, uncompLen) {
+    return mergeUint8([
+        new Uint8Array([0x50,0x4b,0x03,0x04]),
+        u16le(20), u16le(0), u16le(method),
+        u16le(0), u16le(0), // mod time/date
+        u32le(crc), u32le(compLen), u32le(uncompLen),
+        u16le(nameBytes.length), u16le(0),
+        nameBytes
+    ]);
+}
+
+function buildCentralHeader(nameBytes, method, crc, compLen, uncompLen, offset) {
+    return mergeUint8([
+        new Uint8Array([0x50,0x4b,0x01,0x02]),
+        u16le(0x0314), u16le(20), u16le(0), u16le(method),
+        u16le(0), u16le(0),
+        u32le(crc), u32le(compLen), u32le(uncompLen),
+        u16le(nameBytes.length), u16le(0), u16le(0),
+        u16le(0), u16le(0), u32le(0),
+        u32le(offset), nameBytes
+    ]);
+}
+
+function buildEOCD(count, cdSize, cdOffset) {
+    return mergeUint8([
+        new Uint8Array([0x50,0x4b,0x05,0x06]),
+        u16le(0), u16le(0),
+        u16le(count), u16le(count),
+        u32le(cdSize), u32le(cdOffset),
+        u16le(0)
+    ]);
+}
+
+function crc32(buf) {
+    let crc = 0xFFFFFFFF;
+    const table = crc32.table || (crc32.table = (() => {
+        const t = new Uint32Array(256);
+        for (let i = 0; i < 256; i++) {
+            let c = i;
+            for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+            t[i] = c;
+        }
+        return t;
+    })());
+    for (let i = 0; i < buf.length; i++) crc = table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+// ---- XML escape ----
+function xe(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ---- docx namespace ----
+const NS = {
+    wpc:'http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas',
+    cx:'http://schemas.microsoft.com/office/drawing/2014/chartex',
+    mc:'http://schemas.openxmlformats.org/markup-compatibility/2006',
+    aink:'http://schemas.microsoft.com/office/drawing/2016/ink',
+    am3d:'http://schemas.microsoft.com/office/drawing/2017/model3d',
+    o:'urn:schemas-microsoft-com:office:office',
+    oel:'http://schemas.microsoft.com/office/2019/extlst',
+    r:'http://schemas.openxmlformats.org/officeDocument/2006/relationships',
+    m:'http://schemas.openxmlformats.org/officeDocument/2006/math',
+    v:'urn:schemas-microsoft-com:vml',
+    wp14:'http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing',
+    wp:'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing',
+    w10:'urn:schemas-microsoft-com:office:word',
+    w:'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
+    w14:'http://schemas.microsoft.com/office/word/2010/wordml',
+    w15:'http://schemas.microsoft.com/office/word/2012/wordml',
+    w16cex:'http://schemas.microsoft.com/office/word/2018/wordml/cex',
+    w16cid:'http://schemas.microsoft.com/office/word/2016/wordml/cid',
+    w16:'http://schemas.microsoft.com/office/word/2018/wordml',
+    w16sdtdh:'http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash',
+    w16se:'http://schemas.microsoft.com/office/word/2015/wordml/symex',
+    wpg:'http://schemas.microsoft.com/office/word/2010/wordprocessingGroup',
+    wpi:'http://schemas.microsoft.com/office/word/2010/wordprocessingInk',
+    wne:'http://schemas.microsoft.com/office/word/2006/wordml',
+    wps:'http://schemas.microsoft.com/office/word/2010/wordprocessingShape',
+};
+
+// ===== PUBLIC API (compatible with docx.js) =====
+
+const AlignmentType = { LEFT:'left', CENTER:'center', RIGHT:'right', JUSTIFY:'both', START:'start', END:'end' };
+const HeadingLevel = { HEADING_1:'Heading1', HEADING_2:'Heading2', HEADING_3:'Heading3', TITLE:'Title' };
+const WidthType = { PERCENTAGE:'pct', DXA:'dxa', AUTO:'auto', NIL:'nil' };
+const ShadingType = { SOLID:'solid', CLEAR:'clear' };
+const BorderStyle = { SINGLE:'single', NONE:'none', DASHED:'dashed', DOTTED:'dotted', DOUBLE:'double' };
+
+class TextRun {
+    constructor(optionsOrString) {
+        if (typeof optionsOrString === 'string') {
+            this.text = optionsOrString; this.bold = false; this.italic = false;
+            this.size = null; this.color = null; this.break = null;
+        } else {
+            const o = optionsOrString || {};
+            this.text = o.text ?? ''; this.bold = o.bold || false;
+            this.italic = o.italic || false; this.size = o.size || null;
+            this.color = o.color || null; this.break = o.break || null;
+        }
+    }
+    toXml() {
+        let rpr = '';
+        if (this.bold) rpr += '<w:b/>';
+        if (this.italic) rpr += '<w:i/>';
+        if (this.size) rpr += `<w:sz w:val="${this.size}"/><w:szCs w:val="${this.size}"/>`;
+        if (this.color) rpr += `<w:color w:val="${this.color.replace('#','')}"/>`;
+        const rprXml = rpr ? `<w:rPr>${rpr}</w:rPr>` : '';
+        let out = '';
+        if (this.break) out += `<w:r><w:br w:type="page"/></w:r>`;
+        if (this.text !== undefined && this.text !== null) {
+            const t = xe(String(this.text));
+            out += `<w:r>${rprXml}<w:t xml:space="preserve">${t}</w:t></w:r>`;
+        }
+        return out;
+    }
+}
+
+class Paragraph {
+    constructor(options) {
+        const o = typeof options === 'string' ? { text: options } : (options || {});
+        this.text = o.text ?? null;
+        this.children = o.children || (this.text !== null ? [new TextRun(this.text)] : []);
+        this.heading = o.heading || null;
+        this.alignment = o.alignment || null;
+        this.spacing = o.spacing || null;
+    }
+    toXml() {
+        let ppr = '';
+        if (this.heading) ppr += `<w:pStyle w:val="${this.heading}"/>`;
+        if (this.alignment) ppr += `<w:jc w:val="${this.alignment}"/>`;
+        if (this.spacing) {
+            const s = this.spacing;
+            ppr += `<w:spacing${s.before != null ? ` w:before="${s.before}"` : ''}${s.after != null ? ` w:after="${s.after}"` : ''}/>`;
+        }
+        const pprXml = ppr ? `<w:pPr>${ppr}</w:pPr>` : '';
+        const runs = this.children.map(c => c.toXml ? c.toXml() : '').join('');
+        return `<w:p>${pprXml}${runs}</w:p>`;
+    }
+}
+
+function borderXml(b) {
+    if (!b || b.style === BorderStyle.NONE || b.style === 'none') return '';
+    const style = b.style || 'single';
+    const size = b.size || 4;
+    const color = (b.color || '000000').replace('#','');
+    return `w:val="${style}" w:sz="${size}" w:space="0" w:color="${color}"`;
+}
+
+class TableCell {
+    constructor(options) {
+        const o = options || {};
+        this.children = o.children || [];
+        this.shading = o.shading || null;
+        this.borders = o.borders || null;
+        this.width = o.width || null;
+        this.columnSpan = o.columnSpan || 1;
+        this.rowSpan = o.rowSpan || null;
+    }
+    toXml() {
+        let tcpr = '';
+        if (this.columnSpan > 1) tcpr += `<w:gridSpan w:val="${this.columnSpan}"/>`;
+        if (this.rowSpan) tcpr += `<w:vMerge w:val="restart"/>`;
+        if (this.width) {
+            const wtype = this.width.type === WidthType.PERCENTAGE ? 'pct' : 'dxa';
+            const wval = this.width.type === WidthType.PERCENTAGE ? Math.round(this.width.size * 50) : this.width.size;
+            tcpr += `<w:tcW w:w="${wval}" w:type="${wtype}"/>`;
+        }
+        if (this.shading) {
+            const fill = (this.shading.color || 'auto').replace('#','');
+            tcpr += `<w:shd w:val="clear" w:color="auto" w:fill="${fill}"/>`;
+        }
+        if (this.borders) {
+            const b = this.borders;
+            let bxml = '';
+            if (b.top) { const bx = borderXml(b.top); if(bx) bxml += `<w:top ${bx}/>`; }
+            if (b.left) { const bx = borderXml(b.left); if(bx) bxml += `<w:left ${bx}/>`; }
+            if (b.bottom) { const bx = borderXml(b.bottom); if(bx) bxml += `<w:bottom ${bx}/>`; }
+            if (b.right) { const bx = borderXml(b.right); if(bx) bxml += `<w:right ${bx}/>`; }
+            if (bxml) tcpr += `<w:tcBorders>${bxml}</w:tcBorders>`;
+        }
+        const tcprXml = tcpr ? `<w:tcPr>${tcpr}</w:tcPr>` : '';
+        const content = this.children.map(c => c.toXml ? c.toXml() : '').join('');
+        return `<w:tc>${tcprXml}${content}</w:tc>`;
+    }
+}
+
+class TableRow {
+    constructor(options) {
+        const o = options || {};
+        this.children = o.children || [];
+        this.tableHeader = o.tableHeader || false;
+    }
+    toXml() {
+        let trpr = '';
+        if (this.tableHeader) trpr = '<w:trPr><w:tblHeader/></w:trPr>';
+        const cells = this.children.map(c => c.toXml ? c.toXml() : '').join('');
+        return `<w:tr>${trpr}${cells}</w:tr>`;
+    }
+}
+
+class Table {
+    constructor(options) {
+        const o = options || {};
+        this.rows = o.rows || [];
+        this.width = o.width || null;
+        this.columnWidths = o.columnWidths || null;
+    }
+    toXml() {
+        let tblpr = '<w:tblStyle w:val="TableGrid"/>';
+        if (this.width) {
+            const wtype = this.width.type === WidthType.PERCENTAGE ? 'pct' : 'dxa';
+            const wval = this.width.type === WidthType.PERCENTAGE ? Math.round(this.width.size * 50) : this.width.size;
+            tblpr += `<w:tblW w:w="${wval}" w:type="${wtype}"/>`;
+        }
+        let grid = '';
+        if (this.columnWidths) {
+            grid = '<w:tblGrid>' + this.columnWidths.map(w => `<w:gridCol w:w="${w}"/>`).join('') + '</w:tblGrid>';
+        }
+        const rows = this.rows.map(r => r.toXml ? r.toXml() : '').join('');
+        return `<w:tbl><w:tblPr>${tblpr}</w:tblPr>${grid}${rows}</w:tbl>`;
+    }
+}
+
+
+class Document {
+    constructor(options) {
+        const o = options || {};
+        this.sections = o.sections || [];
+    }
+}
+
+class Packer {
+    static async toBlob(doc) {
+        const xml = Packer._buildDocumentXml(doc);
+        const zip = new MiniZip();
+
+        // Fotos aus doc.photos dynamisch einbetten
+        const photos = doc.photos || [];
+        const photoRels = photos.map((p, i) => ({
+            rId: `rIdPhoto${i}`,
+            ext: p.ext || 'jpeg',
+            data: p.data,
+            filename: `photo${i}.${p.ext || 'jpeg'}`
+        }));
+
+        await zip.addFile('[Content_Types].xml', Packer._contentTypes(photoRels));
+        await zip.addFile('_rels/.rels', Packer._rels());
+        await zip.addFile('word/_rels/document.xml.rels', Packer._docRels(photoRels));
+        await zip.addFile('word/document.xml', xml);
+        await zip.addFile('word/styles.xml', Packer._styles());
+        await zip.addFile('word/media/logo.png', b64ToBytes(LKE_LOGO_B64));
+        for (const p of photoRels) {
+            await zip.addFile(`word/media/${p.filename}`, b64ToBytes(p.data));
+        }
+        const bytes = await zip.generate();
+        return new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    }
+
+    static _buildDocumentXml(doc) {
+        const body = doc.sections.flatMap(s => s.children || [])
+            .map(c => c && c.toXml ? c.toXml() : '').join('');
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml"
+  xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+  mc:Ignorable="w14 w15">
+<w:body>${body}<w:sectPr/></w:body></w:document>`;
+    }
+
+    static _contentTypes(photoRels) {
+        const exts = new Set((photoRels || []).map(p => p.ext.replace('jpg','jpeg')));
+        let extras = '';
+        if (exts.has('jpeg')) extras += '\n  <Default Extension="jpeg" ContentType="image/jpeg"/>';
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Default Extension="png" ContentType="image/png"/>${extras}
+</Types>`;
+    }
+
+    static _rels() {
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+    }
+
+    static _docRels(photoRels) {
+        const photoEntries = (photoRels || []).map(p =>
+            `  <Relationship Id="${p.rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${p.filename}"/>`
+        ).join('\n');
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rIdLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo.png"/>
+${photoEntries}
+</Relationships>`;
+    }
+
+    static _styles() {
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml">
+  <w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/>
+    <w:pPr><w:spacing w:after="160" w:line="276" w:lineRule="auto"/></w:pPr>
+    <w:rPr><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/>
+    <w:basedOn w:val="Normal"/>
+    <w:pPr><w:spacing w:before="240" w:after="60"/></w:pPr>
+    <w:rPr><w:b/><w:sz w:val="32"/><w:szCs w:val="32"/><w:color w:val="2E4057"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/>
+    <w:basedOn w:val="Normal"/>
+    <w:pPr><w:spacing w:before="200" w:after="60"/></w:pPr>
+    <w:rPr><w:b/><w:sz w:val="26"/><w:szCs w:val="26"/><w:color w:val="4472C4"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/>
+    <w:basedOn w:val="Normal"/>
+    <w:pPr><w:jc w:val="center"/></w:pPr>
+    <w:rPr><w:b/><w:sz w:val="40"/><w:szCs w:val="40"/></w:rPr>
+  </w:style>
+  <w:style w:type="table" w:styleId="TableGrid"><w:name w:val="Table Grid"/>
+    <w:tblPr><w:tblBorders>
+      <w:top w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+      <w:left w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+      <w:bottom w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+      <w:right w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+      <w:insideH w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+      <w:insideV w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+    </w:tblBorders></w:tblPr>
+    <w:rPr><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr>
+  </w:style>
+</w:styles>`;
+    }
+}
+
+// Expose as global docx object (compatible with docx.js UMD API)
+window.docx = { Document, Packer, Paragraph, Table, TableRow, TableCell, TextRun,
+    HeadingLevel, AlignmentType, WidthType, ShadingType, BorderStyle, PageBreak: class { toXml() { return ''; } } };
+
+console.log('✅ Offline DOCX-Generator geladen (kein Internet erforderlich)');
+})();
+
+// ---- LKE Logo Base64 ----
+const LKE_LOGO_B64 = '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';
+
+// ---- Hilfsfunktion: base64 -> Uint8Array ----
+function b64ToBytes(b64) {
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+}
+
+// ---- Logo-Paragraph (inline Bild oben rechts) ----
+// Bildgröße: 200x81px → in EMU (1px = 9525 EMU)
+const LOGO_CX = 200 * 9525; // 1905000
+const LOGO_CY = 81 * 9525;  // 771525
+
+class LogoParagraph {
+    toXml() {
+        return `<w:p><w:pPr><w:jc w:val="right"/></w:pPr><w:r><w:rPr/><w:drawing>
+<wp:inline distT="0" distB="0" distL="0" distR="0"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
+  <wp:extent cx="${LOGO_CX}" cy="${LOGO_CY}"/>
+  <wp:effectExtent l="0" t="0" r="0" b="0"/>
+  <wp:docPr id="1" name="LKE-Logo"/>
+  <wp:cNvGraphicFramePr/>
+  <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+    <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+      <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+        <pic:nvPicPr>
+          <pic:cNvPr id="1" name="LKE-Logo"/>
+          <pic:cNvPicPr/>
+        </pic:nvPicPr>
+        <pic:blipFill>
+          <a:blip r:embed="rIdLogo" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
+          <a:stretch><a:fillRect/></a:stretch>
+        </pic:blipFill>
+        <pic:spPr>
+          <a:xfrm><a:off x="0" y="0"/><a:ext cx="${LOGO_CX}" cy="${LOGO_CY}"/></a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+        </pic:spPr>
+      </pic:pic>
+    </a:graphicData>
+  </a:graphic>
+</wp:inline>
+</w:drawing></w:r></w:p>`;
+    }
+}
+
+// ---- Foto-Paragraph (eingebettetes Bild im Word) ----
+// Breite max. 9cm (3402000 EMU), Höhe proportional
+class PhotoParagraph {
+    constructor(rId, cx, cy) {
+        this.rId = rId;
+        this.cx = cx;
+        this.cy = cy;
+        this._uid = parseInt(rId.replace('rIdPhoto',''), 10) + 100;
+    }
+    toXml() {
+        return `<w:p><w:pPr><w:jc w:val="left"/><w:spacing w:before="120" w:after="120"/></w:pPr><w:r><w:rPr/><w:drawing>
+<wp:inline distT="0" distB="0" distL="0" distR="0"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
+  <wp:extent cx="${this.cx}" cy="${this.cy}"/>
+  <wp:effectExtent l="0" t="0" r="0" b="0"/>
+  <wp:docPr id="${this._uid}" name="Foto${this._uid}"/>
+  <wp:cNvGraphicFramePr/>
+  <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+    <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+      <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+        <pic:nvPicPr>
+          <pic:cNvPr id="${this._uid}" name="Foto${this._uid}"/>
+          <pic:cNvPicPr/>
+        </pic:nvPicPr>
+        <pic:blipFill>
+          <a:blip r:embed="${this.rId}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
+          <a:stretch><a:fillRect/></a:stretch>
+        </pic:blipFill>
+        <pic:spPr>
+          <a:xfrm><a:off x="0" y="0"/><a:ext cx="${this.cx}" cy="${this.cy}"/></a:xfrm>
+          <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+        </pic:spPr>
+      </pic:pic>
+    </a:graphicData>
+  </a:graphic>
+</wp:inline>
+</w:drawing></w:r></w:p>`;
+    }
+}
+
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 QM Dokumentation</h1>
+            <p>Qualitätssicherung & Warenkontrolle</p>
+            <div id="userDisplay" class="header-user-bar">
+                <span style="font-size:13px; opacity:0.85;">👤</span>
+                <select id="userSelect" onchange="onUserSelect(this)"
+                    style="background:rgba(255,255,255,0.18); color:white; border:1px solid rgba(255,255,255,0.4);
+                           border-radius:8px; padding:6px 10px; font-size:13px; cursor:pointer; min-width:160px;">
+                </select>
+                <button onclick="addNewUser()" title="Neuen Benutzer anlegen"
+                    style="background:rgba(255,255,255,0.18); color:white; border:1px solid rgba(255,255,255,0.4);
+                           border-radius:8px; padding:6px 10px; font-size:13px; cursor:pointer;">＋ Neu</button>
+                <button onclick="removeCurrentUser()" title="Benutzer entfernen"
+                    style="background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.25);
+                           border-radius:8px; padding:6px 8px; font-size:12px; cursor:pointer;">🗑</button>
+                <button onclick="showLoginScreen()" title="Benutzer wechseln"
+                    style="background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.85); border:1px solid rgba(255,255,255,0.25);
+                           border-radius:8px; padding:6px 10px; font-size:12px; cursor:pointer;">⇄ Wechseln</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- LOGIN SCREEN -->
+            <div id="loginScreen" class="login-screen">
+                <div class="login-logo">📋</div>
+                <div class="login-title">QM Dokumentation</div>
+                <div class="login-subtitle">Wer arbeitet heute?</div>
+                <div class="login-user-list" id="loginUserList">
+                    <!-- wird dynamisch befüllt -->
+                </div>
+                <div class="login-divider">oder</div>
+                <button class="login-new-btn" onclick="loginAsNewUser()">＋ Neuen Benutzer anlegen</button>
+            </div>
+
+            <!-- HAUPTMENÜ -->
+            <div id="mainMenu" class="menu-section">
+<div id="menuSuccessMessage" class="success-message">✓ Erfolgreich gespeichert!</div>
+                <div class="menu-grid">
+                    <div class="menu-button" onclick="showForm('wareneingang')">
+                        <div class="icon">📦</div>
+                        <div class="title">Wareneingang</div>
+                    </div>
+                    <div class="menu-button" onclick="showForm('warenausgang')">
+                        <div class="icon">📤</div>
+                        <div class="title">Warenausgang</div>
+                    </div>
+                    <div class="menu-button" onclick="showForm('qualitaet')">
+                        <div class="icon">✓</div>
+                        <div class="title">Qualitätsprüfung</div>
+                    </div>
+                    <div class="menu-button" onclick="showForm('erstmuster')">
+                        <div class="icon">📋</div>
+                        <div class="title">Erstmusterprüfung</div>
+                    </div>
+                    <div class="menu-button" onclick="showHistory()">
+                        <div class="icon">📊</div>
+                        <div class="title">Verlauf anzeigen</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WARENEINGANG FORMULAR -->
+            <div id="wareneingangForm" class="form-section">
+                <button class="back-button" onclick="showMenu()">← Zurück zum Menü</button>
+                <div class="success-message" id="successWareneingang">✓ Wareneingang erfolgreich gespeichert!</div>
+                
+                <h2 style="margin-bottom: 20px;">📦 Wareneingang dokumentieren</h2>
+                
+                <form id="formWareneingang">
+		<div class="form-group">
+    <label>Prüfer *</label>
+    <input type="text" name="pruefer" required placeholder="Name des Prüfers">
+</div>
+
+<div class="form-group">
+    <label>Datum / Uhrzeit</label>
+    <input type="text" name="zeitpunktAnzeige" readonly>
+</div>
+
+<div class="form-group">
+    <label>Vorgangsnummer</label>
+    <input type="text" name="vorgangsnummer" readonly>
+</div>
+
+<div class="form-group">
+    <label>Status</label>
+    <select name="status">
+        <option value="Freigegeben">Freigegeben</option>
+        <option value="Entwurf">Entwurf</option>
+        <option value="Gesperrt">Gesperrt</option>
+    </select>
+</div>
+                    <div class="form-group">
+                        <label>Lieferant *</label>
+                        <input type="text" name="lieferant" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Lieferschein-Nr. *</label>
+                        <input type="text" name="lieferscheinNr" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Artikel/Produkt *</label>
+                        <input type="text" name="artikel" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Menge</label>
+                        <input type="number" name="menge" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prüfpunkte *</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="we_verpackung" name="verpackung">
+                                <label for="we_verpackung">Verpackung unbeschädigt</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="we_vollstaendig" name="vollstaendig">
+                                <label for="we_vollstaendig">Lieferung vollständig</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="we_qualitaet" name="qualitaet">
+                                <label for="we_qualitaet">Sichtprüfung Qualität OK</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="we_dokumente" name="dokumente">
+                                <label for="we_dokumente">Dokumente vollständig</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fotos (optional)</label>
+                        <div class="photo-upload" onclick="document.getElementById('photosWareneingang').click()">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+                            <div>Klicken zum Fotografieren</div>
+                            <input type="file" id="photosWareneingang" accept="image/*" capture="environment" multiple onchange="handlePhotos(event, 'previewWareneingang')">
+                        </div>
+                        <div id="previewWareneingang" class="photo-preview"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bemerkungen</label>
+                        <textarea name="bemerkungen" placeholder="Zusätzliche Informationen..."></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="resetForm('formWareneingang', 'previewWareneingang')">Zurücksetzen</button>
+                        <button type="button" class="btn-secondary" onclick="cancelEdit('formWareneingang', 'previewWareneingang')">Abbrechen</button>
+                        <button type="submit" class="btn-primary">Speichern</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- WARENAUSGANG FORMULAR -->
+            <div id="warenausgangForm" class="form-section">
+                <button class="back-button" onclick="showMenu()">← Zurück zum Menü</button>
+                <div class="success-message" id="successWarenausgang">✓ Warenausgang erfolgreich gespeichert!</div>
+                
+                <h2 style="margin-bottom: 20px;">📤 Warenausgang dokumentieren</h2>
+                		
+
+                <form id="formWarenausgang">
+<div class="form-group">
+    <label>Prüfer *</label>
+    <input type="text" name="pruefer" required placeholder="Name des Prüfers">
+</div>
+
+<div class="form-group">
+    <label>Datum / Uhrzeit</label>
+    <input type="text" name="zeitpunktAnzeige" readonly>
+</div>
+
+<div class="form-group">
+    <label>Vorgangsnummer</label>
+    <input type="text" name="vorgangsnummer" readonly>
+</div>
+
+<div class="form-group">
+    <label>Status</label>
+    <select name="status">
+        <option value="Freigegeben">Freigegeben</option>
+        <option value="Entwurf">Entwurf</option>
+        <option value="Gesperrt">Gesperrt</option>
+    </select>
+</div>	
+                    <div class="form-group">
+                        <label>Kunde/Empfänger *</label>
+                        <input type="text" name="kunde" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Auftragsnummer *</label>
+                        <input type="text" name="auftragsnr" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Artikel/Produkt *</label>
+                        <input type="text" name="artikel" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Menge</label>
+                        <input type="number" name="menge" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prüfpunkte *</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="wa_verpackung" name="verpackung">
+                                <label for="wa_verpackung">Verpackung ordnungsgemäß</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="wa_vollstaendig" name="vollstaendig">
+                                <label for="wa_vollstaendig">Lieferung vollständig</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="wa_etikettierung" name="etikettierung">
+                                <label for="wa_etikettierung">Etikettierung korrekt</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="wa_dokumente" name="dokumente">
+                                <label for="wa_dokumente">Begleitpapiere vollständig</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fotos (optional)</label>
+                        <div class="photo-upload" onclick="document.getElementById('photosWarenausgang').click()">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+                            <div>Klicken zum Fotografieren</div>
+                            <input type="file" id="photosWarenausgang" accept="image/*" capture="environment" multiple onchange="handlePhotos(event, 'previewWarenausgang')">
+                        </div>
+                        <div id="previewWarenausgang" class="photo-preview"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bemerkungen</label>
+                        <textarea name="bemerkungen" placeholder="Zusätzliche Informationen..."></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="resetForm('formWarenausgang', 'previewWarenausgang')">Zurücksetzen</button>
+                        <button type="button" class="btn-secondary" onclick="cancelEdit('formWarenausgang', 'previewWarenausgang')">Abbrechen</button>
+                        <button type="submit" class="btn-primary">Speichern</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- QUALITÄTSPRÜFUNG FORMULAR -->
+            <div id="qualitaetForm" class="form-section">
+                <button class="back-button" onclick="showMenu()">← Zurück zum Menü</button>
+<div class="warning-message" id="warningQualitaet">
+    Achtung: Bei n.i.O. müssen Bemerkung, Sofortmaßnahme, Verantwortlich und Termin ausgefüllt werden.
+</div>
+                <div class="success-message" id="successQualitaet">✓ Qualitätsprüfung erfolgreich gespeichert!</div>
+                
+                <h2 style="margin-bottom: 20px;">✓ Qualitätsprüfung durchführen</h2>
+
+                <!-- Formular-Auswahl -->
+                <div class="form-group" style="background:#f0f4ff; border:2px solid #3b82f6; border-radius:10px; padding:14px 16px; margin-bottom:20px;">
+                    <label style="color:#1d4ed8; font-weight:700; margin-bottom:8px; display:block;">🔧 Prüfformular auswählen</label>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 16px; border-radius:8px; border:2px solid #3b82f6; background:#fff; font-weight:600; transition:all .2s;" id="lblStandard">
+                            <input type="radio" name="pruefFormularTyp" value="standard" checked onchange="switchQualitaetFormular(this.value)" style="width:18px;height:18px;"> Standard
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 16px; border-radius:8px; border:2px solid #e0e0e0; background:#fff; font-weight:600; transition:all .2s;" id="lblRoco">
+                            <input type="radio" name="pruefFormularTyp" value="roco" onchange="switchQualitaetFormular(this.value)" style="width:18px;height:18px;"> RoCo 136-1000
+                        </label>
+                    </div>
+                </div>
+
+<form id="formQualitaet">
+	<div class="form-group">
+    <label>Prüfer *</label>
+    <input type="text" name="pruefer" required placeholder="Name des Prüfers">
+</div>
+
+<div class="form-group">
+    <label>Datum / Uhrzeit</label>
+    <input type="text" name="zeitpunktAnzeige" readonly>
+</div>
+
+<div class="form-group">
+    <label>Vorgangsnummer</label>
+    <input type="text" name="vorgangsnummer" readonly>
+</div>
+
+<div class="form-group">
+    <label>Dokumentstatus <span style="font-weight:normal; color:#888; font-size:12px;">(wird automatisch vorgeschlagen)</span></label>
+    <select name="status" id="qualitaetDokStatus">
+        <option value="Freigegeben">Freigegeben</option>
+        <option value="Entwurf">Entwurf</option>
+        <option value="Gesperrt">Gesperrt</option>
+    </select>
+</div>
+
+                    <div class="form-group">
+                        <label>Produkt/Charge *</label>
+                        <input type="text" name="produkt" required>
+                    </div>
+
+                    <!-- === STANDARD PRÜFFELDER === -->
+                    <div id="q_standard_fields">
+                    <div class="form-group">
+                        <label>Prüfart</label>
+                        <select name="pruefart">
+                            <option value="Eingangsprüfung">Eingangsprüfung</option>
+                            <option value="Zwischenprüfung">Zwischenprüfung</option>
+                            <option value="Endprüfung">Endprüfung</option>
+                            <option value="Stichprobe">Stichprobe</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prüfpunkte *</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="q_masse" name="masse">
+                                <label for="q_masse">Maße/Abmessungen OK</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="q_optik" name="optik">
+                                <label for="q_optik">Optische Prüfung OK</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="q_funktion" name="funktion">
+                                <label for="q_funktion">Funktionsprüfung OK</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="q_material" name="material">
+                                <label for="q_material">Material/Beschaffenheit OK</label>
+                            </div>
+                        </div>
+                    </div>
+                    </div><!-- end q_standard_fields -->
+
+                    <!-- === ROCO PRÜFFELDER === -->
+                    <div id="q_roco_fields" style="display:none;">
+                    <div class="form-group">
+                        <label>Seriennummer</label>
+                        <input type="text" name="seriennummer" placeholder="Seriennummer des RoCo">
+                    </div>
+                    <div class="form-group">
+                        <label>Prüfpunkte RoCo 136-1000</label>
+                        <div style="overflow-x:auto;">
+                        <table class="pruef-table" id="rocoTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:45px; text-align:center;">Nr.</th>
+                                    <th>Prüfkriterium</th>
+                                    <th style="width:160px; text-align:center;">Ergebnis</th>
+                                    <th style="width:28%;">Bemerkung</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rocoTableBody">
+                            <!-- dynamisch gefüllt -->
+                            </tbody>
+                        </table>
+                        </div>
+                        <div style="margin-top:8px; font-size:12px; color:#666; background:#f9f9f9; padding:8px 10px; border-radius:6px; border-left:3px solid #aaa;">
+                            <strong>Legende:</strong>
+                            <span style="color:#16a34a; font-weight:700;">● i.O.</span> = in Ordnung &nbsp;|&nbsp;
+                            <span style="color:#dc2626; font-weight:700;">● Nachgearb.</span> = Nachgearbeitet (X)
+                            &nbsp;— Standard ist <em>i.O.</em> vorgewählt
+                        </div>
+                    </div>
+                    </div><!-- end q_roco_fields -->
+
+                    <div class="form-group">
+                        <label>Prüfergebnis</label>
+                        <select name="ergebnis" onchange="onErgebnisChange(this)">
+                            <option value="io">i.O. (in Ordnung)</option>
+                            <option value="nio">n.i.O. (nicht in Ordnung)</option>
+                            <option value="bedingt">bedingt i.O.</option>
+                        </select>
+                    </div>
+
+		<div class="form-group">
+    <label>Sofortmaßnahme</label>
+    <textarea name="sofortmassnahme" placeholder="Erforderliche Sofortmaßnahme bei Abweichung..."></textarea>
+</div>
+
+<div class="form-group">
+    <label>Verantwortlich</label>
+    <input type="text" name="verantwortlich" placeholder="Wer kümmert sich darum?">
+</div>
+
+<div class="form-group">
+    <label>Termin</label>
+    <input type="date" name="termin">
+</div>
+
+<div class="form-group" id="massnahmenstatusGroup">
+    <label>Maßnahmenstatus <span style="font-weight:normal; color:#888; font-size:12px;">(nur bei n.i.O.)</span></label>
+    <select name="massnahmenstatus">
+        <option value="">– nicht relevant –</option>
+        <option value="offen">🔴 offen</option>
+        <option value="in Bearbeitung">🟡 in Bearbeitung</option>
+        <option value="geschlossen">🟢 geschlossen</option>
+    </select>
+</div>
+
+                    <div class="form-group">
+                        <label>Fotos (optional)</label>
+                        <div class="photo-upload" onclick="document.getElementById('photosQualitaet').click()">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+                            <div>Klicken zum Fotografieren</div>
+                            <input type="file" id="photosQualitaet" accept="image/*" capture="environment" multiple onchange="handlePhotos(event, 'previewQualitaet')">
+                        </div>
+                        <div id="previewQualitaet" class="photo-preview"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bemerkungen/Mängel</label>
+                        <textarea name="bemerkungen" placeholder="Beschreibung von Mängeln oder Auffälligkeiten..."></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="resetForm('formQualitaet', 'previewQualitaet')">Zurücksetzen</button>
+                        <button type="button" class="btn-secondary" onclick="cancelEdit('formQualitaet', 'previewQualitaet')">Abbrechen</button>
+                        <button type="submit" class="btn-primary">Speichern</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ERSTMUSTERPRÜFUNG FORMULAR -->
+            <div id="erstmusterForm" class="form-section">
+                <button class="back-button" onclick="showMenu()">← Zurück zum Menü</button>
+                <div class="success-message" id="successErstmuster">✓ Erstmusterprüfung erfolgreich gespeichert!</div>
+                
+                <h2 style="margin-bottom: 20px;">📋 Erstmusterprüfung</h2>
+         
+       
+                <form id="formErstmuster">
+	<div class="form-group">
+    <label>Prüfer *</label>
+    <input type="text" name="pruefer" required placeholder="Name des Prüfers">
+</div>
+
+<div class="form-group">
+    <label>Datum / Uhrzeit</label>
+    <input type="text" name="zeitpunktAnzeige" readonly>
+</div>
+
+<div class="form-group">
+    <label>Vorgangsnummer</label>
+    <input type="text" name="vorgangsnummer" readonly>
+</div>
+
+<div class="form-group">
+    <label>Status</label>
+    <select name="status">
+        <option value="Freigegeben">Freigegeben</option>
+        <option value="Entwurf">Entwurf</option>
+        <option value="Gesperrt">Gesperrt</option>
+    </select>
+</div>
+
+                    <div class="form-group">
+                        <label>Kunde *</label>
+                        <input type="text" name="kunde" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Produktname *</label>
+                        <input type="text" name="produktname" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Produktnummer</label>
+                        <input type="text" name="produktnummer">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Geprüfte Menge</label>
+                        <input type="number" name="gepruefteMenge" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prüfkriterien</label>
+                        <div style="overflow-x: auto;">
+                            <table class="pruef-table" id="pruefkriterienTable">
+                                <thead>
+                                    <tr>
+                                        <th>Prüfkriterium</th>
+                                        <th class="checkbox-col">OK</th>
+                                        <th class="checkbox-col">n.i.O.</th>
+                                        <th class="checkbox-col">n.a.</th>
+                                        <th class="checkbox-col">Abw.</th>
+                                        <th style="width: 30%;">Bemerkung</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pruefkriterienBody">
+                                    <!-- Wird dynamisch gefüllt -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fotos (optional)</label>
+                        <div class="photo-upload" onclick="document.getElementById('photosErstmuster').click()">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+                            <div>Klicken zum Fotografieren</div>
+                            <input type="file" id="photosErstmuster" accept="image/*" capture="environment" multiple onchange="handlePhotos(event, 'previewErstmuster')">
+                        </div>
+                        <div id="previewErstmuster" class="photo-preview"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Allgemeine Bemerkung</label>
+                        <textarea name="bemerkung" placeholder="Zusätzliche Informationen..."></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="resetForm('formErstmuster', 'previewErstmuster')">Zurücksetzen</button>
+                        <button type="button" class="btn-secondary" onclick="cancelEdit('formErstmuster', 'previewErstmuster')">Abbrechen</button>
+                        <button type="submit" class="btn-primary">Speichern</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- VERLAUF/HISTORY -->
+            <div id="historyView" class="form-section">
+                <button class="back-button" onclick="showMenu()">← Zurück zum Menü</button>
+                
+                <h2 style="margin-bottom: 20px;">📊 Verlauf & Dokumentation</h2>
+                <div class="form-group">
+    <label>Filter</label>
+    <select id="historyFilter" onchange="loadHistory()">
+        <option value="all">Alle anzeigen</option>
+        <option value="wareneingang">Wareneingang</option>
+        <option value="warenausgang">Warenausgang</option>
+        <option value="qualitaet">Qualitätsprüfung</option>
+        <option value="erstmuster">Erstmusterprüfung</option>
+    </select>
+</div>
+<div class="form-group">
+    <label>Suche</label>
+    <input type="text" id="historySearch" placeholder="Vorgangsnr., Prüfer, Artikel, Lieferant…" oninput="loadHistory()" style="width:100%; padding:12px; border:2px solid #e0e0e0; border-radius:8px; font-size:16px;">
+</div>
+                <div class="button-group" style="margin-bottom: 20px;">
+    <button class="btn-secondary" onclick="exportToExcel()">📥 Excel Export</button>
+    <button class="btn-secondary" onclick="exportToWord()">📄 Word Export</button>
+    <button class="btn-secondary" onclick="clearHistory()">🗑️ Verlauf löschen</button>
+</div>
+
+<div id="historyList" class="history-list"></div>
+<h3 style="margin-top:30px;">⚠️ Offene Abweichungen</h3>
+<div id="abweichungenList" class="history-list"></div>
+
+                
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== GLOBALE VARIABLEN =====
+	let editingEntryId = null;
+	let lastSavedId = null;
+        let uploadedPhotos = {
+            wareneingang: [],
+            warenausgang: [],
+            qualitaet: [],
+            erstmuster: []
+        };
+
+const rocoKriterien = [
+    { nr: 1, kategorie: "optische Prüfung", text: "Aufkleber vollständig (Typenschild, Barcode, Warnhinweise etc.)" },
+    { nr: 2, kategorie: "optische Prüfung", text: "Oberflächen möglichst nachverzinken" },
+    { nr: 3, kategorie: "optische Prüfung", text: "Nietköpfe Einsteckrahmen Gratfrei und nicht überstehend" },
+    { nr: 4, kategorie: "optische Prüfung", text: "Nietverbindungen auf Sitz und Gratheit prüfen" },
+    { nr: 5, kategorie: "optische Prüfung", text: "Schraubverbindungen Seitenwand fest angezogen" },
+    { nr: 6, kategorie: "optische Prüfung", text: "Räder und Deichsel fest angezogen" },
+    { nr: 7, kategorie: "optische Prüfung", text: "Rangiergriffe gratfrei" },
+    { nr: 8, kategorie: "optische Prüfung", text: "Feststellvorrichtung gratfrei" },
+    { nr: 9, kategorie: "optische Prüfung", text: "Zurrgurte leichtgängig und gratfrei 3x" },
+    { nr: 10, kategorie: "optische Prüfung", text: "Kunststoff-Abdeckstopfen 3x" },
+    { nr: 11, kategorie: "optische Prüfung", text: "Blechverkleidung ohne Verformung" },
+    { nr: 12, kategorie: "optische Prüfung", text: "Bleche an Rahmen umlaufend gratfrei" },
+    { nr: 13, kategorie: "optische Prüfung", text: "Splinte an Zuggriff gratfrei" },
+    { nr: 14, kategorie: "Funktionsprüfung", text: "Zuggriff richtig montiert, 2x Anschlagkeile vorhanden" },
+    { nr: 15, kategorie: "Funktionsprüfung", text: "Feststellvorrichtung leichtgängig und gefettet" },
+    { nr: 16, kategorie: "Funktionsprüfung", text: "Kupplung / Arretierwippe leichtgängig" },
+    { nr: 17, kategorie: "Funktionsprüfung", text: "Richtungsfeststeller leichtgängig und gekontert" },
+    { nr: 18, kategorie: "Funktionsprüfung", text: "Lenkrollen leichtgängig und in ESD-Ausführung" },
+    { nr: 19, kategorie: "Funktionsprüfung", text: "Deichsel geht eigenständig in Endlage und ist abgeschmiert" },
+    { nr: 20, kategorie: "Funktionsprüfung", text: "Gummipuffer gesichert" },
+    { nr: 21, kategorie: "Funktionsprüfung", text: "Boden rastet leichtgängig und hackt nicht" },
+    { nr: 22, kategorie: "Funktionsprüfung", text: "Klappbare Seitenwand leichtgängig und gefettet" },
+];
+
+        // Standard-Prüfkriterien für Erstmuster
+        const pruefkriterien = [
+            "Maße/Abmessungen",
+            "Oberflächenqualität",
+            "Materialprüfung",
+            "Funktionsprüfung",
+            "Farbe/Optik",
+            "Kennzeichnung/Etikettierung",
+            "Verpackung",
+            "Dokumentation"
+        ];
+
+
+function switchQualitaetFormular(typ) {
+    const stdFields = document.getElementById('q_standard_fields');
+    const rocoFields = document.getElementById('q_roco_fields');
+    const lblStd = document.getElementById('lblStandard');
+    const lblRoco = document.getElementById('lblRoco');
+
+    if (typ === 'roco') {
+        stdFields.style.display = 'none';
+        rocoFields.style.display = '';
+        lblStd.style.borderColor = '#e0e0e0';
+        lblRoco.style.borderColor = '#3b82f6';
+        buildRocoTable();
+    } else {
+        stdFields.style.display = '';
+        rocoFields.style.display = 'none';
+        lblStd.style.borderColor = '#3b82f6';
+        lblRoco.style.borderColor = '#e0e0e0';
+    }
+}
+
+function buildRocoTable() {
+    const tbody = document.getElementById('rocoTableBody');
+    if (!tbody || tbody.dataset.built === '1') return;
+    tbody.dataset.built = '1';
+    let lastKat = '';
+    rocoKriterien.forEach(k => {
+        if (k.kategorie !== lastKat) {
+            lastKat = k.kategorie;
+            const hr = document.createElement('tr');
+            hr.innerHTML = `<td colspan="4" style="background:#e8f0fe; font-weight:700; color:#1d4ed8; padding:8px 12px; font-size:13px; letter-spacing:.5px;">${k.kategorie.toUpperCase()}</td>`;
+            tbody.appendChild(hr);
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align:center; font-weight:600; color:#555;">${k.nr}</td>
+            <td>${k.text}</td>
+            <td style="text-align:center; white-space:nowrap;">
+                <label style="display:inline-flex;align-items:center;gap:5px;margin-right:12px;cursor:pointer;font-weight:600;color:#16a34a;">
+                    <input type="radio" name="roco_${k.nr}_erg" value="io" id="roco_${k.nr}_io" style="width:18px;height:18px;cursor:pointer;" checked>
+                    i.O.
+                </label>
+                <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-weight:600;color:#dc2626;">
+                    <input type="radio" name="roco_${k.nr}_erg" value="x" id="roco_${k.nr}_x" style="width:18px;height:18px;cursor:pointer;">
+                    Nachgearb.
+                </label>
+            </td>
+            <td><input type="text" name="roco_${k.nr}_bem" placeholder="Bemerkung..." style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:5px;font-size:13px;"></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function rocoToggle(nr, xCheckbox) {
+    // no longer needed – handled by radio buttons natively
+}
+
+function collectRocoData() {
+    const data = {};
+    rocoKriterien.forEach(k => {
+        const selected = document.querySelector(`input[name="roco_${k.nr}_erg"]:checked`)?.value || 'io';
+        const io = selected === 'io';
+        const x = selected === 'x';
+        const bem = document.querySelector(`input[name="roco_${k.nr}_bem"]`)?.value || '';
+        data['roco_' + k.nr] = { nr: k.nr, kategorie: k.kategorie, text: k.text, io, x, bem };
+    });
+    return data;
+}
+
+		function generateVorgangsnummer(type) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const sec = String(now.getSeconds()).padStart(2, '0');
+
+    const prefixMap = {
+        wareneingang: 'WE',
+        warenausgang: 'WA',
+        qualitaet: 'QP',
+        erstmuster: 'EMP'
+    };
+
+    return `${prefixMap[type]}-${year}${month}${day}-${hour}${min}${sec}`;
+}
+
+function formatDateTimeForDisplay(date = new Date()) {
+    return date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE');
+}
+
+function fillFormMetadata(formId, type) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    const zeitpunktField = form.querySelector('input[name="zeitpunktAnzeige"]');
+    const vorgangsnummerField = form.querySelector('input[name="vorgangsnummer"]');
+    const pruefer = form.querySelector('input[name="pruefer"]');
+
+    if (zeitpunktField) zeitpunktField.value = formatDateTimeForDisplay();
+    if (vorgangsnummerField) vorgangsnummerField.value = generateVorgangsnummer(type);
+
+    // Prüfer mit aktuellem Benutzer vorbelegen (nur wenn leer)
+    const currentUser = loadCurrentUser();
+    if (pruefer && currentUser) {
+    pruefer.value = currentUser;
+}
+    // Dropdown synchron halten
+    const sel = document.getElementById('userSelect');
+    if (sel && currentUser && sel.value !== currentUser) {
+        sel.value = currentUser;
+    }
+}
+
+function validateQualitaetForm(data) {
+    if (data.ergebnis === 'nio') {
+        if (
+            !data.bemerkungen?.trim() ||
+            !data.sofortmassnahme?.trim() ||
+            !data.verantwortlich?.trim() ||
+            !data.termin?.trim()
+        ) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function getStatusClass(status) {
+    if (status === 'Freigegeben') return 'status-freigegeben';
+    if (status === 'Entwurf') return 'status-entwurf';
+    if (status === 'Gesperrt') return 'status-gesperrt';
+    return '';
+}
+        // ===== NAVIGATION =====
+        function showLoginScreen() {
+            // Alles ausblenden
+            document.getElementById('loginScreen').classList.remove('active');
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('userDisplay').classList.remove('visible');
+            // Login aufbauen und zeigen
+            buildLoginScreen();
+            document.getElementById('loginScreen').classList.add('active');
+        }
+
+        function buildLoginScreen() {
+            const list = loadUserList();
+            const container = document.getElementById('loginUserList');
+            container.innerHTML = '';
+            if (list.length === 0) {
+                container.innerHTML = '<p style="color:#aaa; font-size:14px;">Noch keine Benutzer angelegt.</p>';
+                return;
+            }
+            list.forEach(name => {
+                const btn = document.createElement('button');
+                btn.className = 'login-user-btn';
+                const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                btn.innerHTML = `<div class="user-avatar">${initials}</div><span>${name}</span>`;
+                btn.onclick = () => loginAs(name);
+                container.appendChild(btn);
+            });
+        }
+
+        function loginAs(name) {
+            saveCurrentUser(name);
+            buildUserDropdown();
+            prefillAllPruefer(name);
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('userDisplay').classList.add('visible');
+            showMenu();
+        }
+
+        function loginAsNewUser() {
+            const name = prompt('Name des neuen Benutzers:');
+            if (!name || !name.trim()) return;
+            const trimmed = name.trim();
+            const list = loadUserList();
+            if (!list.includes(trimmed)) {
+                list.push(trimmed);
+                saveUserList(list);
+            }
+            loginAs(trimmed);
+        }
+function showMenuSuccess(message = '✓ Erfolgreich gespeichert!') {
+    const box = document.getElementById('menuSuccessMessage');
+    if (!box) return;
+
+    box.textContent = message;
+    box.classList.add('show');
+
+    setTimeout(() => {
+        box.classList.remove('show');
+    }, 2200);
+}
+        function showMenu() {
+            document.getElementById('loginScreen').classList.remove('active');
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('mainMenu').style.display = 'block';
+            document.getElementById('userDisplay').classList.add('visible');
+        }
+
+        function showForm(formType) {
+    document.getElementById('mainMenu').style.display = 'none';
+    document.querySelectorAll('.form-section').forEach(section => {
+        section.classList.remove('active');
+    });
+
+    if (formType === 'wareneingang') {
+        document.getElementById('wareneingangForm').classList.add('active');
+        if (!editingEntryId) fillFormMetadata('formWareneingang', 'wareneingang');
+    } else if (formType === 'warenausgang') {
+        document.getElementById('warenausgangForm').classList.add('active');
+        if (!editingEntryId) fillFormMetadata('formWarenausgang', 'warenausgang');
+    } else if (formType === 'qualitaet') {
+        document.getElementById('qualitaetForm').classList.add('active');
+        if (!editingEntryId) fillFormMetadata('formQualitaet', 'qualitaet');
+    } else if (formType === 'erstmuster') {
+        document.getElementById('erstmusterForm').classList.add('active');
+        initPruefkriterienTable();
+        if (!editingEntryId) fillFormMetadata('formErstmuster', 'erstmuster');
+    }
+}
+
+        function showHistory(keepSearch) {
+    document.getElementById('mainMenu').style.display = 'none';
+
+    document.querySelectorAll('.form-section').forEach(section => {
+        section.classList.remove('active');
+    });
+
+    document.getElementById('historyView').classList.add('active');
+
+    if (!keepSearch) {
+        const s = document.getElementById('historySearch');
+        if (s) s.value = '';
+    }
+
+    loadHistory();
+}
+
+        // ===== ERSTMUSTER PRÜFKRITERIEN TABELLE =====
+        function initPruefkriterienTable() {
+            const tbody = document.getElementById('pruefkriterienBody');
+            tbody.innerHTML = '';
+            
+            pruefkriterien.forEach((kriterium, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${kriterium}</td>
+                    <td class="checkbox-col"><input type="checkbox" id="pk_${index}_ok"></td>
+                    <td class="checkbox-col"><input type="checkbox" id="pk_${index}_nok"></td>
+                    <td class="checkbox-col"><input type="checkbox" id="pk_${index}_na"></td>
+                    <td class="checkbox-col"><input type="checkbox" id="pk_${index}_ab"></td>
+                    <td><input type="text" id="pk_${index}_bem" placeholder="Bemerkung"></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ===== FOTO-HANDLING =====
+        function handlePhotos(event, previewId) {
+            const files = event.target.files;
+            const preview = document.getElementById(previewId);
+            
+            let formType = '';
+            if (previewId.includes('Wareneingang')) formType = 'wareneingang';
+            else if (previewId.includes('Warenausgang')) formType = 'warenausgang';
+            else if (previewId.includes('Qualitaet')) formType = 'qualitaet';
+            else if (previewId.includes('Erstmuster')) formType = 'erstmuster';
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedPhotos[formType].push(e.target.result);
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ===== FORMULAR RESET =====
+        function resetForm(formId, previewId) {
+            document.getElementById(formId).reset();
+            document.getElementById(previewId).innerHTML = '';
+            
+            let formType = '';
+            if (formId.includes('Wareneingang')) formType = 'wareneingang';
+            else if (formId.includes('Warenausgang')) formType = 'warenausgang';
+            else if (formId.includes('Qualitaet')) {
+                formType = 'qualitaet';
+                // RoCo Tabelle zurücksetzen
+                const rocoTbody = document.getElementById('rocoTableBody');
+                if (rocoTbody) { rocoTbody.innerHTML = ''; rocoTbody.dataset.built = ''; }
+                // Formular-Auswahl zurück auf Standard
+                const stdRadio = document.querySelector('input[name="pruefFormularTyp"][value="standard"]');
+                if (stdRadio) { stdRadio.checked = true; switchQualitaetFormular('standard'); }
+            }
+            else if (formId.includes('Erstmuster')) {
+                formType = 'erstmuster';
+                initPruefkriterienTable();
+            }
+            
+            uploadedPhotos[formType] = [];
+        }
+
+        function saveData(type, data) {
+    let allData = JSON.parse(localStorage.getItem('qmData')) || [];
+
+    if (editingEntryId) {
+        const id = editingEntryId;
+        allData = allData.map(entry => {
+            if (entry.id === id) {
+                return {
+                    ...entry,
+                    type: type,
+                    vorgangsnummer: data.vorgangsnummer || entry.vorgangsnummer,
+                    pruefer: data.pruefer || '',
+                    status: data.status || 'Freigegeben',
+                    data: data,
+                    photos: uploadedPhotos[type].length > 0 ? uploadedPhotos[type] : entry.photos || []
+                };
+            }
+            return entry;
+        });
+        localStorage.setItem('qmData', JSON.stringify(allData));
+        editingEntryId = null;
+        return id;
+    }
+
+    const entry = {
+        id: Date.now(),
+        type: type,
+        timestamp: new Date().toISOString(),
+        vorgangsnummer: data.vorgangsnummer || generateVorgangsnummer(type),
+        pruefer: data.pruefer || '',
+        status: data.status || 'Freigegeben',
+        data: data,
+        photos: uploadedPhotos[type] || []
+    };
+
+    allData.push(entry);
+    localStorage.setItem('qmData', JSON.stringify(allData));
+    return entry.id;
+}
+
+        // ===== FORMULAR SUBMIT HANDLER =====
+        document.getElementById('formWareneingang').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            data.checkboxen = {
+                verpackung: document.getElementById('we_verpackung').checked,
+                vollstaendig: document.getElementById('we_vollstaendig').checked,
+                qualitaet: document.getElementById('we_qualitaet').checked,
+                dokumente: document.getElementById('we_dokumente').checked
+            };
+            
+            const savedId = saveData('wareneingang', data);
+            resetForm('formWareneingang', 'previewWareneingang');
+            fillFormMetadata('formWareneingang', 'wareneingang');
+            lastSavedId = savedId;
+            showMenu();
+	showMenuSuccess();
+        });
+
+        document.getElementById('formWarenausgang').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            data.checkboxen = {
+                verpackung: document.getElementById('wa_verpackung').checked,
+                vollstaendig: document.getElementById('wa_vollstaendig').checked,
+                etikettierung: document.getElementById('wa_etikettierung').checked,
+                dokumente: document.getElementById('wa_dokumente').checked
+            };
+            
+            const savedId = saveData('warenausgang', data);
+            resetForm('formWarenausgang', 'previewWarenausgang');
+            fillFormMetadata('formWarenausgang', 'warenausgang');
+            lastSavedId = savedId;
+            showMenu();
+showMenuSuccess();
+        });
+
+        document.getElementById('formQualitaet').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const data = {};
+
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+
+    // Prüfformular-Typ ermitteln
+    const pruefTyp = document.querySelector('input[name="pruefFormularTyp"]:checked')?.value || 'standard';
+    data.pruefFormularTyp = pruefTyp;
+
+    if (pruefTyp === 'roco') {
+        data.checkboxen = {};
+        data.rocoErgebnisse = collectRocoData();
+    } else {
+        data.checkboxen = {
+            masse: document.getElementById('q_masse').checked,
+            optik: document.getElementById('q_optik').checked,
+            funktion: document.getElementById('q_funktion').checked,
+            material: document.getElementById('q_material').checked
+        };
+    }
+
+    const warningMsg = document.getElementById('warningQualitaet');
+
+    if (!validateQualitaetForm(data)) {
+        warningMsg.classList.add('show');
+        setTimeout(() => warningMsg.classList.remove('show'), 4000);
+        return;
+    }
+
+    const savedId = saveData('qualitaet', data);
+
+    warningMsg.classList.remove('show');
+    resetForm('formQualitaet', 'previewQualitaet');
+    fillFormMetadata('formQualitaet', 'qualitaet');
+    lastSavedId = savedId;
+    showMenu();
+showMenuSuccess();
+});
+
+document.getElementById('formErstmuster').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const data = {};
+
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
+
+    data.pruefkriterien = [];
+    pruefkriterien.forEach((kriterium, index) => {
+        data.pruefkriterien.push({
+            name: kriterium,
+            ok: document.getElementById(`pk_${index}_ok`).checked,
+            nok: document.getElementById(`pk_${index}_nok`).checked,
+            na: document.getElementById(`pk_${index}_na`).checked,
+            ab: document.getElementById(`pk_${index}_ab`).checked,
+            bemerkung: document.getElementById(`pk_${index}_bem`).value
+        });
+    });
+
+    const savedId = saveData('erstmuster', data);
+
+    resetForm('formErstmuster', 'previewErstmuster');
+    fillFormMetadata('formErstmuster', 'erstmuster');
+    lastSavedId = savedId;
+    showMenu();
+showMenuSuccess();
+});
+
+        // ===== VERLAUF LADEN UND ANZEIGEN =====
+        function loadHistory() {
+		const filter = document.getElementById('historyFilter')?.value || 'all';
+            const allData = JSON.parse(localStorage.getItem('qmData')) || [];
+            const historyList = document.getElementById('historyList');
+            
+            if (allData.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">Noch keine Einträge vorhanden</p>';
+                
+            }
+            
+            allData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            historyList.innerHTML = '';
+
+            const searchTerm = (document.getElementById('historySearch')?.value || '').toLowerCase().trim();
+            let filteredData = getFilteredAndSearched(allData);
+
+            if (filteredData.length === 0) {
+                historyList.innerHTML = `<p style="text-align:center; color:#999; padding:40px;">${searchTerm ? '🔍 Keine Einträge gefunden für „' + searchTerm + '"' : 'Keine Einträge in dieser Kategorie'}</p>`;
+                return;
+            }
+
+const abweichungenList = document.getElementById('abweichungenList');
+abweichungenList.innerHTML = '';
+
+const abweichungen = allData.filter(entry =>
+    entry.type === 'qualitaet' &&
+    entry.data.ergebnis === 'nio' &&
+    (entry.data.massnahmenstatus === 'offen' || entry.data.massnahmenstatus === 'in Bearbeitung')
+);
+
+if (abweichungen.length === 0) {
+    abweichungenList.innerHTML = '<p style="color:#999;">Keine offenen Abweichungen</p>';
+} else {
+    abweichungen.forEach(entry => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+
+        item.innerHTML = `
+            <strong>${entry.vorgangsnummer}</strong><br>
+            <strong>Produkt:</strong> ${entry.data.produkt || '-'}<br>
+            <strong>Maßnahme:</strong> ${entry.data.sofortmassnahme || '-'}<br>
+            <strong>Verantwortlich:</strong> ${entry.data.verantwortlich || '-'}<br>
+            <strong>Termin:</strong> ${entry.data.termin || '-'}<br>
+            <strong>Status:</strong> ${entry.data.massnahmenstatus || '-'}
+<br><br>
+<button onclick="closeAbweichung(${entry.id})" class="btn-secondary">✔ Abschließen</button>
+        `;
+
+        abweichungenList.appendChild(item);
+    });
+}
+
+
+filteredData.forEach(entry => {
+                const item = document.createElement('div');
+item.className = 'history-item';
+item.dataset.entryId = entry.id;
+                const typeLabels = {
+                    'wareneingang': '📦 Wareneingang',
+                    'warenausgang': '📤 Warenausgang',
+                    'qualitaet': '✓ Qualitätsprüfung',
+                    'erstmuster': '📋 Erstmusterprüfung'
+                };
+                
+                const date = new Date(entry.timestamp);
+                const dateStr = date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE');
+                
+                let detailsHTML = '';
+                if (entry.type === 'wareneingang') {
+                    detailsHTML = `
+                        <strong>Lieferant:</strong> ${entry.data.lieferant || '-'}<br>
+                        <strong>Lieferschein:</strong> ${entry.data.lieferscheinNr || '-'}<br>
+                        <strong>Artikel:</strong> ${entry.data.artikel || '-'}<br>
+                        <strong>Menge:</strong> ${entry.data.menge || '-'}<br>
+                        ${entry.data.bemerkungen ? '<strong>Bemerkungen:</strong> ' + entry.data.bemerkungen : ''}
+                    `;
+                } else if (entry.type === 'warenausgang') {
+                    detailsHTML = `
+                        <strong>Kunde:</strong> ${entry.data.kunde || '-'}<br>
+                        <strong>Auftragsnr:</strong> ${entry.data.auftragsnr || '-'}<br>
+                        <strong>Artikel:</strong> ${entry.data.artikel || '-'}<br>
+                        <strong>Menge:</strong> ${entry.data.menge || '-'}<br>
+                        ${entry.data.bemerkungen ? '<strong>Bemerkungen:</strong> ' + entry.data.bemerkungen : ''}
+                    `;
+                } else if (entry.type === 'qualitaet') {
+                    detailsHTML = `
+                        ${entry.data.pruefFormularTyp === 'roco' ? '<span style="display:inline-block;background:#3b82f6;color:#fff;border-radius:5px;padding:2px 8px;font-size:12px;font-weight:700;margin-bottom:6px;">🔧 RoCo 136-1000</span><br>' : ''}
+                        <strong>Produkt:</strong> ${entry.data.produkt || '-'}<br>
+                        ${entry.data.pruefFormularTyp !== 'roco' ? '<strong>Prüfart:</strong> ' + (entry.data.pruefart || '-') + '<br>' : ''}
+                        ${entry.data.seriennummer ? '<strong>Seriennummer:</strong> ' + entry.data.seriennummer + '<br>' : ''}
+                        <strong>Ergebnis:</strong> ${entry.data.ergebnis || '-'}<br>
+		<br>
+<strong>Maßnahmenstatus:</strong><br>
+<span class="status-badge ${entry.data.massnahmenstatus === 'geschlossen' ? 'status-freigegeben' : entry.data.massnahmenstatus === 'offen' ? 'status-gesperrt' : 'status-entwurf'}">
+    ${entry.data.massnahmenstatus || '-'}
+</span><br><br>
+${entry.data.bemerkungen ? '<strong>Bemerkungen:</strong> ' + entry.data.bemerkungen : ''}
+
+                    `;
+                } else if (entry.type === 'erstmuster') {
+                    detailsHTML = `
+                        <strong>Kunde:</strong> ${entry.data.kunde || '-'}<br>
+                        <strong>Produktname:</strong> ${entry.data.produktname || '-'}<br>
+                        <strong>Produktnummer:</strong> ${entry.data.produktnummer || '-'}<br>
+                        <strong>Geprüfte Menge:</strong> ${entry.data.gepruefteMenge || '-'}<br>
+                        ${entry.data.bemerkung ? '<strong>Bemerkung:</strong> ' + entry.data.bemerkung : ''}
+                    `;
+                }
+                
+                let photosHTML = '';
+                if (entry.photos && entry.photos.length > 0) {
+                    photosHTML = '<div class="photos">';
+                    entry.photos.forEach(photo => {
+                        photosHTML += `<img src="${photo}" onclick="window.open(this.src)">`;
+                    });
+                    photosHTML += '</div>';
+                }
+                
+                item.innerHTML = `
+    <div class="header-row">
+        <div class="type">${typeLabels[entry.type]}</div>
+        <div class="date">${dateStr}</div>
+    </div>
+    <div class="details">
+        <strong>Vorgangsnummer:</strong> ${entry.vorgangsnummer || '-'}<br>
+        <strong>Prüfer:</strong> ${entry.pruefer || '-'}<br>
+        <strong>Status:</strong><br>
+<span class="status-badge ${getStatusClass(entry.status)}">${entry.status || '-'}</span><br><br>
+        ${detailsHTML}
+    </div>
+<br><br>
+<button onclick="editEntry(${entry.id})" class="btn-secondary">✏️ Bearbeiten</button>
+<button onclick="exportSingleToWord(${entry.id})" class="btn-secondary">📄 Word</button>
+    ${photosHTML}
+`;
+                
+                historyList.appendChild(item);
+            });
+
+            // Highlight zuletzt gespeicherter Eintrag
+            if (lastSavedId) {
+                const highlighted = historyList.querySelector(`[data-entry-id="${lastSavedId}"]`);
+                if (highlighted) {
+                    highlighted.classList.add('highlight-new');
+                    highlighted.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => highlighted.classList.remove('highlight-new'), 3500);
+                }
+                lastSavedId = null;
+            }
+        }
+
+        // ===== EXPORT ZU EXCEL (CSV) =====
+        function exportToExcel() {
+            const allData = JSON.parse(localStorage.getItem('qmData')) || [];
+            if (allData.length === 0) { alert('Keine Daten zum Exportieren vorhanden'); return; }
+
+            let filteredData = getFilteredAndSearched(allData);
+            if (filteredData.length === 0) { alert('Keine Daten für den aktuellen Filter/Suche vorhanden'); return; }
+
+            let csv = 'Typ;Vorgangsnummer;Datum;Prüfer;Dokumentstatus;Details\n';
+
+            filteredData.forEach(entry => {
+                const typeLabels = {
+                    'wareneingang': 'Wareneingang',
+                    'warenausgang': 'Warenausgang',
+                    'qualitaet': 'Qualitätsprüfung',
+                    'erstmuster': 'Erstmusterprüfung'
+                };
+                
+                let details = JSON.stringify(entry.data).replace(/"/g, '""');
+                const dateStr2 = new Date(entry.timestamp).toLocaleDateString('de-DE');
+                const timeStr2 = new Date(entry.timestamp).toLocaleTimeString('de-DE');
+                csv += `${typeLabels[entry.type]};${entry.vorgangsnummer || ''};${dateStr2} ${timeStr2};${entry.pruefer || ''};${entry.status || ''};"${details}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'qm-dokumentation-' + new Date().toISOString().split('T')[0] + '.csv');
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+function buildRocoDocxRows(rocoErgebnisse) {
+    const { Paragraph, Table, TableRow, TableCell, TextRun, WidthType, ShadingType, AlignmentType, BorderStyle } = docx;
+    const rows = [];
+    const thinBorder = { style: BorderStyle.SINGLE, size: 4, color: "999999" };
+    const border = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
+
+    // Header row
+    rows.push(new TableRow({ children: [
+        new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Nr.", bold: true, size: 18, color: "FFFFFF" })], alignment: AlignmentType.CENTER })], shading: { type: ShadingType.CLEAR, fill: "1565C0" }, borders: border, width: { size: 500, type: WidthType.DXA } }),
+        new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Prüfkriterium", bold: true, size: 18, color: "FFFFFF" })] })], shading: { type: ShadingType.CLEAR, fill: "1565C0" }, borders: border, width: { size: 4200, type: WidthType.DXA } }),
+        new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "i.O.", bold: true, size: 18, color: "FFFFFF" })], alignment: AlignmentType.CENTER })], shading: { type: ShadingType.CLEAR, fill: "1565C0" }, borders: border, width: { size: 800, type: WidthType.DXA } }),
+        new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Nachgearb.", bold: true, size: 18, color: "FFFFFF" })], alignment: AlignmentType.CENTER })], shading: { type: ShadingType.CLEAR, fill: "1565C0" }, borders: border, width: { size: 1100, type: WidthType.DXA } }),
+        new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Bemerkung", bold: true, size: 18, color: "FFFFFF" })] })], shading: { type: ShadingType.CLEAR, fill: "1565C0" }, borders: border, width: { size: 2760, type: WidthType.DXA } }),
+    ], tableHeader: true }));
+
+    let lastKat = '';
+    Object.values(rocoErgebnisse).forEach(item => {
+        const kat = item.kategorie || 'Prüfpunkte';
+        if (kat !== lastKat) {
+            lastKat = kat;
+            rows.push(new TableRow({ children: [
+                new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "", size: 16 })] })], shading: { type: ShadingType.CLEAR, fill: "BBDEFB" }, borders: border }),
+                new TableCell({ columnSpan: 4, children: [new Paragraph({ children: [new TextRun({ text: kat.toUpperCase(), bold: true, color: "1565C0", size: 16 })] })], shading: { type: ShadingType.CLEAR, fill: "BBDEFB" }, borders: border }),
+            ]}));
+        }
+        rows.push(new TableRow({ children: [
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: String(item.nr), bold: true, size: 18 })], alignment: AlignmentType.CENTER })], borders: border }),
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: item.text, size: 18 })] })], borders: border }),
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: (item.io && !item.x) ? "✔" : "", color: "16a34a", bold: true, size: 20 })], alignment: AlignmentType.CENTER })], borders: border }),
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: item.x ? "X" : "", color: "dc2626", bold: true, size: 20 })], alignment: AlignmentType.CENTER })], borders: border }),
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: item.bem || "", size: 18 })] })], borders: border }),
+        ]}));
+    });
+    return rows;
+}
+
+function buildDocxChildren(entry) {
+    const { Paragraph, Table, TableRow, TableCell, TextRun, HeadingLevel, WidthType, ShadingType, AlignmentType, BorderStyle, PageBreak } = docx;
+    const thinBorder = { style: BorderStyle.SINGLE, size: 4, color: "B0BEC5" };
+    const border = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
+    const noBorder = { style: BorderStyle.NIL };
+    const noBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
+    const typeLabels = { wareneingang: 'Wareneingang', warenausgang: 'Warenausgang', qualitaet: 'Qualitätsprüfung', erstmuster: 'Erstmusterprüfung' };
+
+    // Übersetzungstabelle: camelCase-Schlüssel → lesbarer deutscher Name
+    const fieldLabels = {
+        pruefart: 'Prüfart',
+        ergebnis: 'Ergebnis',
+        sofortmassnahme: 'Sofortmaßnahme',
+        verantwortlich: 'Verantwortlich',
+        termin: 'Termin',
+        massnahmenstatus: 'Maßnahmenstatus',
+        bemerkungen: 'Bemerkungen',
+        bemerkung: 'Bemerkung',
+        lieferant: 'Lieferant',
+        lieferscheinNr: 'Lieferschein-Nr.',
+        artikel: 'Artikel',
+        menge: 'Menge',
+        kunde: 'Kunde',
+        auftragsnr: 'Auftrags-Nr.',
+        produkt: 'Produkt',
+        produktname: 'Produktname',
+        produktnummer: 'Produktnummer',
+        gepruefteMenge: 'Geprüfte Menge',
+        seriennummer: 'Seriennummer',
+        pruefFormularTyp: 'Prüfformular-Typ',
+        zeitpunkt: 'Zeitpunkt',
+    };
+
+    const children = [];
+
+    // ---- Kopfzeilen-Tabelle: Titel links, Logo rechts ----
+    const headerBorderColor = "1565C0";
+    const headerBorder = { style: BorderStyle.SINGLE, size: 6, color: headerBorderColor };
+    const headerBorders = { top: noBorder, bottom: headerBorder, left: noBorder, right: noBorder };
+
+    const titleLabel = typeLabels[entry.type] || entry.type;
+    children.push(new Table({
+        width: { size: 9360, type: WidthType.DXA },
+        columnWidths: [6500, 2860],
+        borders: { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder, insideH: noBorder, insideV: noBorder },
+        rows: [
+            new TableRow({ children: [
+                new TableCell({
+                    borders: noBorders,
+                    verticalAlign: 'bottom',
+                    children: [new Paragraph({
+                        children: [new TextRun({ text: titleLabel, bold: true, size: 52, color: "1565C0", font: "Arial" })],
+                    })],
+                }),
+                new TableCell({
+                    borders: noBorders,
+                    children: [new LogoParagraph()],
+                }),
+            ]}),
+            new TableRow({ children: [
+                new TableCell({
+                    borders: { top: noBorder, bottom: headerBorder, left: noBorder, right: noBorder },
+                    children: [new Paragraph({
+                        children: [
+                            new TextRun({ text: "Exportiert am: ", bold: true, size: 18, color: "546E7A" }),
+                            new TextRun({ text: new Date().toLocaleString('de-DE'), size: 18, color: "546E7A" }),
+                        ],
+                        spacing: { after: 80 },
+                    })],
+                }),
+                new TableCell({
+                    borders: { top: noBorder, bottom: headerBorder, left: noBorder, right: noBorder },
+                    children: [new Paragraph({ text: "" })],
+                }),
+            ]}),
+        ],
+    }));
+    children.push(new Paragraph({ text: "" }));
+
+    // ---- Daten-Tabelle ----
+    const headerShading = { type: ShadingType.CLEAR, fill: "1565C0" };
+    const altShading = { type: ShadingType.CLEAR, fill: "E3F2FD" };
+
+    const dataRows = [
+        new TableRow({ children: [
+            new TableCell({
+                children: [new Paragraph({ children: [new TextRun({ text: "Feld", bold: true, color: "FFFFFF", size: 20 })] })],
+                shading: headerShading,
+                borders: border,
+                width: { size: 3000, type: WidthType.DXA },
+                margins: { top: 80, bottom: 80, left: 120, right: 120 },
+            }),
+            new TableCell({
+                children: [new Paragraph({ children: [new TextRun({ text: "Wert", bold: true, color: "FFFFFF", size: 20 })] })],
+                shading: headerShading,
+                borders: border,
+                width: { size: 6360, type: WidthType.DXA },
+                margins: { top: 80, bottom: 80, left: 120, right: 120 },
+            }),
+        ], tableHeader: true }),
+        new TableRow({ children: [
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Vorgangsnummer", bold: true, size: 18 })] })], borders: border, width: { size: 3000, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 } }),
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: entry.vorgangsnummer || '-', size: 18 })] })], borders: border, width: { size: 6360, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 } }),
+        ]}),
+        new TableRow({ children: [
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Prüfer", bold: true, size: 18 })] })], shading: altShading, borders: border, width: { size: 3000, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 } }),
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: entry.pruefer || '-', size: 18 })] })], shading: altShading, borders: border, width: { size: 6360, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 } }),
+        ]}),
+        new TableRow({ children: [
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Status", bold: true, size: 18 })] })], borders: border, width: { size: 3000, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 } }),
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: entry.status || '-', size: 18 })] })], borders: border, width: { size: 6360, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 } }),
+        ]}),
+        new TableRow({ children: [
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Datum/Zeit Eintrag", bold: true, size: 18 })] })], shading: altShading, borders: border, width: { size: 3000, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 } }),
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: new Date(entry.timestamp).toLocaleString('de-DE'), size: 18 })] })], shading: altShading, borders: border, width: { size: 6360, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 } }),
+        ]}),
+    ];
+    const skipKeys = new Set(['pruefer','vorgangsnummer','status','rocoErgebnisse','pruefFormularTyp','zeitpunktAnzeige']);
+    const isRoco = entry.type === 'qualitaet' && entry.data.pruefFormularTyp === 'roco';
+    let rowIdx = 4;
+    Object.entries(entry.data).forEach(([key, value]) => {
+        if (skipKeys.has(key) || typeof value === 'object') return;
+        if (isRoco && key.startsWith('roco_')) return;
+        const label = fieldLabels[key] || (key.charAt(0).toUpperCase() + key.slice(1));
+        const shade = (rowIdx % 2 === 0) ? {} : { shading: altShading };
+        dataRows.push(new TableRow({ children: [
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: label, bold: true, size: 18 })] })], borders: border, width: { size: 3000, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 }, ...shade }),
+            new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: String(value || '-'), size: 18 })] })], borders: border, width: { size: 6360, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 120, right: 120 }, ...shade }),
+        ]}));
+        rowIdx++;
+    });
+    children.push(new Table({ rows: dataRows, width: { size: 9360, type: WidthType.DXA }, columnWidths: [3000, 6360] }));
+
+    // RoCo Tabelle
+    if (entry.type === 'qualitaet' && entry.data.pruefFormularTyp === 'roco' && entry.data.rocoErgebnisse) {
+        children.push(new Paragraph({ text: "" }));
+        children.push(new Paragraph({
+            children: [new TextRun({ text: "Prüfpunkte RoCo 136-1000", bold: true, size: 28, color: "1565C0" })],
+            spacing: { before: 200, after: 120 },
+        }));
+        const rocoRows = buildRocoDocxRows(entry.data.rocoErgebnisse);
+        children.push(new Table({
+            rows: rocoRows,
+            width: { size: 9360, type: WidthType.DXA },
+            columnWidths: [500, 4200, 800, 1100, 2760],
+        }));
+    }
+
+    // Foto-Abschnitt
+    if (entry.photos && entry.photos.length > 0) {
+        const photoOffset = entry._photoOffset || 0;
+        children.push(new Paragraph({ text: "" }));
+        children.push(new Paragraph({
+            children: [new TextRun({ text: `Fotos (${entry.photos.length})`, bold: true, size: 28, color: "1565C0" })],
+            spacing: { before: 200, after: 120 },
+        }));
+        entry.photos.forEach((dataUrl, i) => {
+            const match = dataUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+            if (!match) return;
+            const maxCX = 3402000;
+            const cx = maxCX;
+            const cy = Math.round(maxCX * 3 / 4);
+            children.push(new PhotoParagraph(`rIdPhoto${photoOffset + i}`, cx, cy));
+        });
+    }
+
+    return children;
+}
+
+async function exportSingleToWord(id) {
+    const allData = JSON.parse(localStorage.getItem('qmData')) || [];
+    const entry = allData.find(e => e.id === id);
+    if (!entry) { alert('Eintrag nicht gefunden'); return; }
+    if (typeof docx === 'undefined') { alert('DOCX-Generator nicht verfügbar. Bitte Seite neu laden.'); return; }
+
+    const { Document, Packer, Paragraph, TextRun } = docx;
+
+    // Fotos aus base64-DataURLs extrahieren
+    const photos = (entry.photos || []).map((dataUrl, i) => {
+        const match = dataUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+        if (!match) return null;
+        return { ext: match[1].replace('jpg','jpeg'), data: match[2] };
+    }).filter(Boolean);
+
+    const doc = new Document({
+        sections: [{ properties: {}, children: buildDocxChildren(entry) }],
+        photos
+    });
+
+    const blob = await Packer.toBlob(doc);
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = (entry.vorgangsnummer || 'QM-Eintrag') + '.docx';
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+        // ===== EXPORT ZU WORD (SAMMEL) =====
+        async function exportToWord() {
+            const allData = JSON.parse(localStorage.getItem('qmData')) || [];
+            if (allData.length === 0) { alert('Keine Daten zum Exportieren vorhanden'); return; }
+            const exportData = getFilteredAndSearched(allData);
+            if (exportData.length === 0) { alert('Keine Daten für den aktuellen Filter/Suche vorhanden'); return; }
+            if (typeof docx === 'undefined') { alert('DOCX-Generator nicht verfügbar. Bitte Seite neu laden.'); return; }
+
+            const { Document, Packer, Paragraph, TextRun, HeadingLevel, PageBreak } = docx;
+            const sections = [];
+
+            // Alle Fotos aller Einträge sammeln (global indexiert für rIds)
+            const allPhotos = [];
+            exportData.forEach(entry => {
+                (entry.photos || []).forEach(dataUrl => {
+                    const match = dataUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+                    if (match) allPhotos.push({ ext: match[1].replace('jpg','jpeg'), data: match[2] });
+                });
+            });
+
+            // Beim Bauen der Kinder den globalen Foto-Offset pro Eintrag setzen
+            let photoOffset = 0;
+            exportData.forEach((entry, index) => {
+                // Temporär den entry.photos-Index auf den globalen Offset anpassen
+                const origPhotos = entry.photos || [];
+                const patchedEntry = Object.assign({}, entry, {
+                    _photoOffset: photoOffset
+                });
+                const children = buildDocxChildren(patchedEntry);
+                photoOffset += origPhotos.filter(d => d.match(/^data:image/)).length;
+                if (index < exportData.length - 1) {
+                    children.push(new Paragraph({ children: [new TextRun({ break: 1 })] }));
+                }
+                sections.push({ properties: {}, children });
+            });
+
+            const doc = new Document({ sections, photos: allPhotos });
+            const blob = await Packer.toBlob(doc);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'QM-Dokumentation-' + new Date().toISOString().split('T')[0] + '.docx';
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ===== VERLAUF LÖSCHEN =====
+        function clearHistory() {
+
+            if (confirm('Wirklich alle Einträge löschen? Dies kann nicht rückgängig gemacht werden!')) {
+                localStorage.removeItem('qmData');
+                loadHistory();
+                alert('Verlauf gelöscht');
+            }
+        }
+
+
+function closeAbweichung(id) {
+    let allData = JSON.parse(localStorage.getItem('qmData')) || [];
+
+    allData = allData.map(entry => {
+        if (entry.id === id) {
+            entry.data.massnahmenstatus = 'geschlossen';
+        }
+        return entry;
+    });
+
+    localStorage.setItem('qmData', JSON.stringify(allData));
+    loadHistory();
+}
+
+function cancelEdit(formId, previewId) {
+    editingEntryId = null;
+    resetForm(formId, previewId);
+    showHistory();
+}
+
+function editEntry(id) {
+    const allData = JSON.parse(localStorage.getItem('qmData')) || [];
+    const entry = allData.find(e => e.id === id);
+	editingEntryId = id;
+
+    if (!entry) return;
+
+    // Bestehende Fotos in uploadedPhotos laden und Preview befüllen
+    const typeKey = entry.type;
+    uploadedPhotos[typeKey] = entry.photos ? [...entry.photos] : [];
+
+    const previewIdMap = {
+        wareneingang: 'previewWareneingang',
+        warenausgang: 'previewWarenausgang',
+        qualitaet: 'previewQualitaet',
+        erstmuster: 'previewErstmuster'
+    };
+    const previewEl = document.getElementById(previewIdMap[typeKey]);
+    if (previewEl) {
+        previewEl.innerHTML = '';
+        uploadedPhotos[typeKey].forEach(src => {
+            const img = document.createElement('img');
+            img.src = src;
+            previewEl.appendChild(img);
+        });
+    }
+
+    if (entry.type === 'qualitaet') {
+    showForm('qualitaet');
+} else if (entry.type === 'wareneingang') {
+    showForm('wareneingang');
+} else if (entry.type === 'warenausgang') {
+    showForm('warenausgang');
+} else if (entry.type === 'erstmuster') {
+    showForm('erstmuster');
+}
+
+if (entry.type === 'wareneingang') {
+    const form = document.getElementById('formWareneingang');
+    form.querySelector('[name="pruefer"]').value = entry.data.pruefer || '';
+    form.querySelector('[name="zeitpunktAnzeige"]').value = entry.data.zeitpunktAnzeige || '';
+    form.querySelector('[name="vorgangsnummer"]').value = entry.data.vorgangsnummer || '';
+    form.querySelector('[name="status"]').value = entry.data.status || 'Freigegeben';
+    form.querySelector('[name="lieferant"]').value = entry.data.lieferant || '';
+    form.querySelector('[name="lieferscheinNr"]').value = entry.data.lieferscheinNr || '';
+    form.querySelector('[name="artikel"]').value = entry.data.artikel || '';
+    form.querySelector('[name="menge"]').value = entry.data.menge || '';
+    form.querySelector('[name="bemerkungen"]').value = entry.data.bemerkungen || '';
+    document.getElementById('we_verpackung').checked = entry.data.checkboxen?.verpackung || false;
+    document.getElementById('we_vollstaendig').checked = entry.data.checkboxen?.vollstaendig || false;
+    document.getElementById('we_qualitaet').checked = entry.data.checkboxen?.qualitaet || false;
+    document.getElementById('we_dokumente').checked = entry.data.checkboxen?.dokumente || false;
+} else if (entry.type === 'warenausgang') {
+    const form = document.getElementById('formWarenausgang');
+    form.querySelector('[name="pruefer"]').value = entry.data.pruefer || '';
+    form.querySelector('[name="zeitpunktAnzeige"]').value = entry.data.zeitpunktAnzeige || '';
+    form.querySelector('[name="vorgangsnummer"]').value = entry.data.vorgangsnummer || '';
+    form.querySelector('[name="status"]').value = entry.data.status || 'Freigegeben';
+    form.querySelector('[name="kunde"]').value = entry.data.kunde || '';
+    form.querySelector('[name="auftragsnr"]').value = entry.data.auftragsnr || '';
+    form.querySelector('[name="artikel"]').value = entry.data.artikel || '';
+    form.querySelector('[name="menge"]').value = entry.data.menge || '';
+    form.querySelector('[name="bemerkungen"]').value = entry.data.bemerkungen || '';
+    document.getElementById('wa_verpackung').checked = entry.data.checkboxen?.verpackung || false;
+    document.getElementById('wa_vollstaendig').checked = entry.data.checkboxen?.vollstaendig || false;
+    document.getElementById('wa_etikettierung').checked = entry.data.checkboxen?.etikettierung || false;
+    document.getElementById('wa_dokumente').checked = entry.data.checkboxen?.dokumente || false;
+} else if (entry.type === 'qualitaet') {
+    const form = document.getElementById('formQualitaet');
+    form.querySelector('[name="pruefer"]').value = entry.data.pruefer || '';
+    form.querySelector('[name="zeitpunktAnzeige"]').value = entry.data.zeitpunktAnzeige || '';
+    form.querySelector('[name="vorgangsnummer"]').value = entry.data.vorgangsnummer || '';
+    form.querySelector('[name="status"]').value = entry.data.status || 'Freigegeben';
+    form.querySelector('[name="produkt"]').value = entry.data.produkt || '';
+    form.querySelector('[name="pruefart"]').value = entry.data.pruefart || '';
+    form.querySelector('[name="ergebnis"]').value = entry.data.ergebnis || 'io';
+    form.querySelector('[name="sofortmassnahme"]').value = entry.data.sofortmassnahme || '';
+    form.querySelector('[name="verantwortlich"]').value = entry.data.verantwortlich || '';
+    form.querySelector('[name="termin"]').value = entry.data.termin || '';
+    form.querySelector('[name="massnahmenstatus"]').value = entry.data.massnahmenstatus || '';
+    form.querySelector('[name="bemerkungen"]').value = entry.data.bemerkungen || '';
+    if (entry.data.pruefFormularTyp === 'roco') {
+        // RoCo Formular wiederherstellen
+        const rocoRadio = document.querySelector('input[name="pruefFormularTyp"][value="roco"]');
+        if (rocoRadio) { rocoRadio.checked = true; switchQualitaetFormular('roco'); }
+        if (entry.data.seriennummer) form.querySelector('[name="seriennummer"]').value = entry.data.seriennummer;
+        // RoCo Radio-Buttons und Bemerkungen wiederherstellen
+        if (entry.data.rocoErgebnisse) {
+            Object.values(entry.data.rocoErgebnisse).forEach(r => {
+                const val = r.x ? 'x' : 'io';
+                const radioEl = document.querySelector(`input[name="roco_${r.nr}_erg"][value="${val}"]`);
+                const bemEl = form.querySelector(`[name="roco_${r.nr}_bem"]`);
+                if (radioEl) radioEl.checked = true;
+                if (bemEl) bemEl.value = r.bem || '';
+            });
+        }
+    } else {
+        document.getElementById('q_masse').checked = entry.data.checkboxen?.masse || false;
+        document.getElementById('q_optik').checked = entry.data.checkboxen?.optik || false;
+        document.getElementById('q_funktion').checked = entry.data.checkboxen?.funktion || false;
+        document.getElementById('q_material').checked = entry.data.checkboxen?.material || false;
+    }
+} else if (entry.type === 'erstmuster') {
+    const form = document.getElementById('formErstmuster');
+    form.querySelector('[name="pruefer"]').value = entry.data.pruefer || '';
+    form.querySelector('[name="zeitpunktAnzeige"]').value = entry.data.zeitpunktAnzeige || '';
+    form.querySelector('[name="vorgangsnummer"]').value = entry.data.vorgangsnummer || '';
+    form.querySelector('[name="status"]').value = entry.data.status || 'Freigegeben';
+    form.querySelector('[name="kunde"]').value = entry.data.kunde || '';
+    form.querySelector('[name="produktname"]').value = entry.data.produktname || '';
+    form.querySelector('[name="produktnummer"]').value = entry.data.produktnummer || '';
+    form.querySelector('[name="gepruefteMenge"]').value = entry.data.gepruefteMenge || '';
+    form.querySelector('[name="bemerkung"]').value = entry.data.bemerkung || '';
+    // Prüfkriterien wiederherstellen
+    if (entry.data.pruefkriterien) {
+        entry.data.pruefkriterien.forEach((pk, index) => {
+            const okEl = document.getElementById(`pk_${index}_ok`);
+            const nokEl = document.getElementById(`pk_${index}_nok`);
+            const naEl = document.getElementById(`pk_${index}_na`);
+            const abEl = document.getElementById(`pk_${index}_ab`);
+            const bemEl = document.getElementById(`pk_${index}_bem`);
+            if (okEl) okEl.checked = pk.ok || false;
+            if (nokEl) nokEl.checked = pk.nok || false;
+            if (naEl) naEl.checked = pk.na || false;
+            if (abEl) abEl.checked = pk.ab || false;
+            if (bemEl) bemEl.value = pk.bemerkung || '';
+        });
+    }
+}}
+        // ===== BENUTZER-VERWALTUNG =====
+        function loadUserList() {
+            return JSON.parse(localStorage.getItem('qmUserList') || '[]');
+        }
+
+        function saveUserList(list) {
+            localStorage.setItem('qmUserList', JSON.stringify(list));
+        }
+
+        function loadCurrentUser() {
+            return localStorage.getItem('qmCurrentUser') || '';
+        }
+
+        function saveCurrentUser(name) {
+            localStorage.setItem('qmCurrentUser', name);
+        }
+
+        function buildUserDropdown() {
+            const select = document.getElementById('userSelect');
+            if (!select) return;
+            const list = loadUserList();
+            const current = loadCurrentUser();
+            select.innerHTML = '';
+
+            if (list.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = '– kein Benutzer –';
+                select.appendChild(opt);
+            } else {
+                list.forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = name;
+                    if (name === current) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        function onUserSelect(select) {
+            const name = select.value;
+            saveCurrentUser(name);
+            prefillAllPruefer(name);
+        }
+
+        function prefillAllPruefer(name) {
+            // In alle sichtbaren Prüfer-Felder eintragen
+            document.querySelectorAll('input[name="pruefer"]').forEach(el => {
+                el.value = name;
+            });
+        }
+
+        function addNewUser() {
+            const name = prompt('Name des neuen Benutzers:');
+            if (!name || !name.trim()) return;
+            const trimmed = name.trim();
+            const list = loadUserList();
+            if (list.includes(trimmed)) {
+                // Bereits vorhanden – einfach auswählen
+                saveCurrentUser(trimmed);
+                buildUserDropdown();
+                prefillAllPruefer(trimmed);
+                return;
+            }
+            list.push(trimmed);
+            saveUserList(list);
+            saveCurrentUser(trimmed);
+            buildUserDropdown();
+            prefillAllPruefer(trimmed);
+        }
+
+        function removeCurrentUser() {
+            const current = loadCurrentUser();
+            if (!current) return;
+            if (!confirm(`Benutzer „${current}" entfernen?`)) return;
+            let list = loadUserList();
+            list = list.filter(n => n !== current);
+            saveUserList(list);
+            const next = list[0] || '';
+            saveCurrentUser(next);
+            buildUserDropdown();
+            prefillAllPruefer(next);
+            if (!next) showLoginScreen();
+        }
+
+        function updateUserLabel() {
+            buildUserDropdown();
+        }
+
+        // ===== HELPER: Filter + Suche für Export =====
+        function getFilteredAndSearched(allData) {
+            const filter = document.getElementById('historyFilter')?.value || 'all';
+            const searchTerm = (document.getElementById('historySearch')?.value || '').toLowerCase().trim();
+
+            let result = allData;
+            if (filter !== 'all') {
+                result = result.filter(e => e.type === filter);
+            }
+            if (searchTerm) {
+                result = result.filter(entry => {
+                    const searchable = [
+                        entry.vorgangsnummer, entry.pruefer, entry.status,
+                        entry.data.lieferant, entry.data.lieferscheinNr, entry.data.artikel,
+                        entry.data.kunde, entry.data.auftragsnr, entry.data.produkt,
+                        entry.data.pruefart, entry.data.ergebnis, entry.data.produktname,
+                        entry.data.produktnummer, entry.data.verantwortlich,
+                        entry.data.bemerkungen, entry.data.bemerkung, entry.data.sofortmassnahme,
+                    ].filter(Boolean).join(' ').toLowerCase();
+                    return searchable.includes(searchTerm);
+                });
+            }
+            return result;
+        }
+
+        // ===== STATUSLOGIK =====
+        function onErgebnisChange(select) {
+            const val = select.value;
+            const dokStatus = document.getElementById('qualitaetDokStatus');
+            if (dokStatus) {
+                if (val === 'nio') dokStatus.value = 'Gesperrt';
+                else if (val === 'bedingt') dokStatus.value = 'Entwurf';
+                else dokStatus.value = 'Freigegeben';
+            }
+        }
+
+        // ===== INITIALISIERUNG =====
+        window.addEventListener('load', function() {
+            // Migration: falls alter String-User existiert, in Liste übernehmen
+            const oldUser = loadCurrentUser();
+            if (oldUser) {
+                const list = loadUserList();
+                if (!list.includes(oldUser)) {
+                    list.push(oldUser);
+                    saveUserList(list);
+                }
+            }
+            buildUserDropdown();
+
+            const currentUser = loadCurrentUser();
+            const userList = loadUserList();
+
+            if (!currentUser || userList.length === 0) {
+                // Kein Benutzer bekannt → Login zeigen
+                showLoginScreen();
+            } else {
+                // Bekannter Benutzer → direkt ins Menü
+                document.getElementById('userDisplay').classList.add('visible');
+                prefillAllPruefer(currentUser);
+                showMenu();
+            }
+        });
+    </script>
+</body>
+</html>
